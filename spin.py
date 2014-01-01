@@ -14,7 +14,7 @@
 # The program spin provides an interface for control of the usage modes of     #
 # laptop-tablet and similar computer interface devices.                        #
 #	                                                                       #
-# copyright (C) 2013 2014 William Breaden Madden                              #
+# copyright (C) 2013 2014 William Breaden Madden                               #
 #                                                                              #
 # This software is released under the terms of the GNU General Public License  #
 # version 3 (GPLv3).                                                           #
