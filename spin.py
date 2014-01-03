@@ -1,6 +1,16 @@
 #!/usr/bin/env python
 
 """
+spin, a small utility to assist in setting usage modes of laptop-tablet devices
+
+Usage:
+    spin.py
+    spin.py -h | --help
+    spin.py --nogui
+Options:
+    -h,--help      : show this help message
+    --nogui        : non-GUI mode
+"""
 ################################################################################
 #                                                                              #
 # spin                                                                         #
@@ -33,11 +43,13 @@
 # <http://www.gnu.org/licenses/>.                                              #
 #                                                                              #
 ################################################################################
-"""
 
+from docopt import docopt
 import os
 import sys
 import subprocess
+from multiprocessing import Process
+import time
 from PyQt4 import QtGui
 import logging
 
@@ -47,74 +59,96 @@ logging.basicConfig()
 logger.level = logging.INFO
 
 class interface(QtGui.QWidget):
-    def __init__(self):
+    def __init__(
+        self,
+        docopt_args=None
+	):
+        self.docopt_args=docopt_args
         super(interface, self).__init__()
-        # create buttons
-        buttonsList = []
-        # button: tablet mode
-        buttonModeTablet = QtGui.QPushButton('tablet mode', self)
-        buttonModeTablet.clicked.connect(self.engageModeTablet)
-        buttonsList.append(buttonModeTablet)
-        # button: laptop mode
-        buttonModeLaptop = QtGui.QPushButton('laptop mode', self)
-        buttonModeLaptop.clicked.connect(self.engageModeLaptop)
-        buttonsList.append(buttonModeLaptop)
-        # button: left
-        buttonLeft = QtGui.QPushButton('left', self)
-        buttonLeft.clicked.connect(self.engageLeft)
-        buttonsList.append(buttonLeft)
-        # button: right
-        buttonRight = QtGui.QPushButton('right', self)
-        buttonRight.clicked.connect(self.engageRight)
-        buttonsList.append(buttonRight)
-        # button: inverted
-        buttonInverted = QtGui.QPushButton('inverted', self)
-        buttonInverted.clicked.connect(self.engageInverted)
-        buttonsList.append(buttonInverted)
-        # button: normal
-        buttonNormal = QtGui.QPushButton('normal', self)
-        buttonNormal.clicked.connect(self.engageNormal)
-        buttonsList.append(buttonNormal)
-        # button: touchscreen on
-        buttonTouchscreenOn = QtGui.QPushButton('touchscreen on', self)
-        buttonTouchscreenOn.clicked.connect(self.engageTouchscreenOn)
-        buttonsList.append(buttonTouchscreenOn)
-        # button: touchscreen off
-        buttonTouchscreenOff = QtGui.QPushButton('touchscreen off', self)
-        buttonTouchscreenOff.clicked.connect(self.engageTouchscreenOff)
-        buttonsList.append(buttonTouchscreenOff)
-        # button: touchpad on
-        buttonTouchpadOn = QtGui.QPushButton('touchpad on', self)
-        buttonTouchpadOn.clicked.connect(self.engageTouchpadOn)
-        buttonsList.append(buttonTouchpadOn)
-        # button: touchpad off
-        buttonTouchpadOff = QtGui.QPushButton('touchpad off', self)
-        buttonTouchpadOff.clicked.connect(self.engageTouchpadOff)
-        buttonsList.append(buttonTouchpadOff)
-        # button: nipple on
-        buttonNippleOn = QtGui.QPushButton('nipple on', self)
-        buttonNippleOn.clicked.connect(self.engageNippleOn)
-        buttonsList.append(buttonNippleOn)
-        # button: nipple off
-        buttonNippleOff = QtGui.QPushButton('nipple off', self)
-        buttonNippleOff.clicked.connect(self.engageNippleOff)
-        buttonsList.append(buttonNippleOff)
-        # set button dimensions
-        buttonsWidth=150
-        buttonsHeight=60
-        for button in buttonsList:
-            button.setFixedSize(buttonsWidth, buttonsHeight)
-        # set layout
-        vbox = QtGui.QVBoxLayout()
-        vbox.addStretch(1)
-        for button in buttonsList:
-            vbox.addWidget(button)
-            vbox.addStretch(1)	
-        self.setLayout(vbox)
-        # window
-        self.setGeometry(200, 200, 150, 100)
-        self.setWindowTitle('spin')
-        self.show()
+        logger.info("running spin")
+        # engage stylus proximity control
+        self.stylusProximityControlOn()
+        if not docopt_args["--nogui"]:
+            # create buttons
+            buttonsList = []
+            # button: tablet mode
+            buttonModeTablet = QtGui.QPushButton('tablet mode', self)
+            buttonModeTablet.clicked.connect(self.engageModeTablet)
+            buttonsList.append(buttonModeTablet)
+            # button: laptop mode
+            buttonModeLaptop = QtGui.QPushButton('laptop mode', self)
+            buttonModeLaptop.clicked.connect(self.engageModeLaptop)
+            buttonsList.append(buttonModeLaptop)
+            # button: left
+            buttonLeft = QtGui.QPushButton('left', self)
+            buttonLeft.clicked.connect(self.engageLeft)
+            buttonsList.append(buttonLeft)
+            # button: right
+            buttonRight = QtGui.QPushButton('right', self)
+            buttonRight.clicked.connect(self.engageRight)
+            buttonsList.append(buttonRight)
+            # button: inverted
+            buttonInverted = QtGui.QPushButton('inverted', self)
+            buttonInverted.clicked.connect(self.engageInverted)
+            buttonsList.append(buttonInverted)
+            # button: normal
+            buttonNormal = QtGui.QPushButton('normal', self)
+            buttonNormal.clicked.connect(self.engageNormal)
+            buttonsList.append(buttonNormal)
+            # button: touchscreen on
+            buttonTouchscreenOn = QtGui.QPushButton('touchscreen on', self)
+            buttonTouchscreenOn.clicked.connect(self.engageTouchscreenOn)
+            buttonsList.append(buttonTouchscreenOn)
+            # button: touchscreen off
+            buttonTouchscreenOff = QtGui.QPushButton('touchscreen off', self)
+            buttonTouchscreenOff.clicked.connect(self.engageTouchscreenOff)
+            buttonsList.append(buttonTouchscreenOff)
+            # button: touchpad on
+            buttonTouchpadOn = QtGui.QPushButton('touchpad on', self)
+            buttonTouchpadOn.clicked.connect(self.engageTouchpadOn)
+            buttonsList.append(buttonTouchpadOn)
+            # button: touchpad off
+            buttonTouchpadOff = QtGui.QPushButton('touchpad off', self)
+            buttonTouchpadOff.clicked.connect(self.engageTouchpadOff)
+            buttonsList.append(buttonTouchpadOff)
+            # button: nipple on
+            buttonNippleOn = QtGui.QPushButton('nipple on', self)
+            buttonNippleOn.clicked.connect(self.engageNippleOn)
+            buttonsList.append(buttonNippleOn)
+            # button: nipple off
+            buttonNippleOff = QtGui.QPushButton('nipple off', self)
+            buttonNippleOff.clicked.connect(self.engageNippleOff)
+            buttonsList.append(buttonNippleOff)
+            # button: stylus proximity on
+            buttonStylusProximityControlOn = QtGui.QPushButton('stylus proximity on', self)
+            buttonStylusProximityControlOn.clicked.connect(self.engageStylusProximityControlOn)
+            buttonsList.append(buttonStylusProximityControlOn)
+            # button: stylus proximity off
+            buttonStylusProximityControlOff = QtGui.QPushButton('stylus proximity off', self)
+            buttonStylusProximityControlOff.clicked.connect(self.engageStylusProximityControlOff)
+            buttonsList.append(buttonStylusProximityControlOff)
+            # set button dimensions
+            buttonsWidth=150
+            buttonsHeight=60
+            for button in buttonsList:
+                button.setFixedSize(buttonsWidth, buttonsHeight)
+            # set layout
+            vbox = QtGui.QVBoxLayout()
+            vbox.addStretch(1)
+            for button in buttonsList:
+                vbox.addWidget(button)
+                vbox.addStretch(1)	
+            self.setLayout(vbox)
+            # window
+            self.setGeometry(200, 200, 150, 100)
+            self.setWindowTitle('spin')
+            self.show()
+	elif docopt_args["--nogui"]:
+            logger.info("non-GUI mode")
+    def closeEvent(self, event):
+        logger.info("stopping spin")
+        self.stylusProximityControlOff()
+        self.deleteLater() 
     def displayLeft(self):
         logger.info("changing display to left")
         os.system('xrandr -o left')
@@ -157,6 +191,26 @@ class interface(QtGui.QWidget):
     def nippleOff(self):
         logger.info("changing nipple to off")
         os.system('xinput disable "TPPS/2 IBM TrackPoint"')
+    def stylusProximityControl(self):
+        previousProximityStatus = None
+        while True:
+            proximityCommand = 'xinput query-state "Wacom ISDv4 EC Pen stylus" | grep Proximity | cut -d " " -f3 | cut -d "=" -f2'
+            proximityStatus = subprocess.check_output(proximityCommand, shell=True).lower().rstrip()
+            if (proximityStatus == "out") and (previousProximityStatus != "out"):
+                logger.info("stylus inactive")
+		self.touchscreenOn()
+            elif (proximityStatus == "in") and (previousProximityStatus != "in"):
+                logger.info("stylus active")
+		self.touchscreenOff()
+	    previousProximityStatus = proximityStatus
+            time.sleep(0.25)
+    def stylusProximityControlOn(self):
+        logger.info("changing stylus proximity control to on")
+	self.process1 = Process(target=self.stylusProximityControl)
+	self.process1.start()
+    def stylusProximityControlOff(self):
+        logger.info("changing stylus proximity control to off")
+	self.process1.terminate()
     def engageModeTablet(self):
         logger.info("engaging mode tablet")
         self.displayLeft()
@@ -199,10 +253,14 @@ class interface(QtGui.QWidget):
         self.nippleOn()
     def engageNippleOff(self):
         self.nippleOff()
-def main():
-    logger.info("running spin")
+    def engageStylusProximityControlOn(self):
+        self.stylusProximityControlOn()
+    def engageStylusProximityControlOff(self):
+        self.stylusProximityControlOff()
+def main(docopt_args):
     application = QtGui.QApplication(sys.argv)
-    interface1 = interface()
+    interface1 = interface(docopt_args)
     sys.exit(application.exec_())
 if __name__ == '__main__':
-    main()
+    args = docopt(__doc__)
+    main(args)
