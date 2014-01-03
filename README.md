@@ -4,15 +4,12 @@ a small utility to assist in setting usage modes of laptop-tablet devices
 
 ## quick start
 
-### spin
+### setup
 
-Download [```spin.py```](https://raw.github.com/wdbm/spin/master/spin.py).
-
-### docopts
-
-Spin is dependent on the module [```docopt```](http://docopt.org/). ```docopt``` can be used directly by having [docopt.py](https://raw.github.com/wdbm/spin/master/docopt.py) in the same directory as ```spin.py``` or it can be installed:
-
-   pip install docopt
+- spin
+    - Download [spin.py](https://raw.github.com/wdbm/spin/master/spin.py).
+- docopts
+    - Spin is dependent on the module [```docopt```](http://docopt.org/). ```docopt``` can be used directly by having [docopt.py](https://raw.github.com/wdbm/spin/master/docopt.py) in the same directory as spin.py or it can be installed: ```pip install docopt```
 
 ### run
 
