@@ -15,7 +15,7 @@ Options:
 #                                                                              #
 # spin                                                                         #
 #                                                                              #
-# version: 2014-01-03T0355                                                     #
+# version: 2014-01-04T0439                                                     #
 #                                                                              #
 ################################################################################
 #                                                                              #
@@ -129,7 +129,7 @@ class interface(QtGui.QWidget):
             buttonsList.append(buttonStylusProximityControlOff)
             # set button dimensions
             buttonsWidth=150
-            buttonsHeight=60
+            buttonsHeight=50
             for button in buttonsList:
                 button.setFixedSize(buttonsWidth, buttonsHeight)
             # set layout
@@ -140,8 +140,9 @@ class interface(QtGui.QWidget):
                 vbox.addStretch(1)	
             self.setLayout(vbox)
             # window
-            self.setGeometry(200, 200, 150, 100)
-            self.setWindowTitle('spin')
+	    self.setWindowTitle('spin')
+            # set window position
+	    self.move(0, 0)
             self.show()
 	elif docopt_args["--nogui"]:
             logger.info("non-GUI mode")
@@ -215,7 +216,6 @@ class interface(QtGui.QWidget):
         logger.info("engaging mode tablet")
         self.displayLeft()
 	self.touchscreenLeft()
-        self.touchscreenOff()
         self.touchpadOff()
         self.nippleOff()
     def engageModeLaptop(self):
