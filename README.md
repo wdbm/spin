@@ -21,4 +21,5 @@ while the non-graphical mode is engaged by using the command line argument ```--
 
     spin.py --nogui
 
-By default, the utility disables the touchscreen on detecting the stylus in proximity. This facility is provided by the non-graphical mode.
+By default, the utility disables the touchscreen on detecting the stylus in proximity and it changes between the laptop and tablet modes on detecting toggling between the laptop and tablet usage configurations. These default behaviours are provided by both the graphical and non-graphical modes of this utility. Spin should be started in the laptop usage configuration.
+
