@@ -23,7 +23,7 @@ Options:
 #                                                                              #
 # The program spin provides an interface for control of the usage modes of     #
 # laptop-tablet and similar computer interface devices.                        #
-#	                                                                      #
+#                                                                              #
 # copyright (C) 2013 2014 William Breaden Madden                               #
 #                                                                              #
 # This software is released under the terms of the GNU General Public License  #
@@ -49,6 +49,7 @@ import os
 import sys
 import subprocess
 from multiprocessing import Process
+import socket
 import time
 from PyQt4 import QtGui
 import logging
@@ -68,6 +69,9 @@ class interface(QtGui.QWidget):
         logger.info("running spin")
         # engage stylus proximity control
         self.stylusProximityControlOn()
+	# engage display position control
+	self.displayPositionStatus = "laptop"
+        self.displayPositionControlOn()
         if not docopt_args["--nogui"]:
             # create buttons
             buttonsList = []
@@ -119,16 +123,24 @@ class interface(QtGui.QWidget):
             buttonNippleOff = QtGui.QPushButton('nipple off', self)
             buttonNippleOff.clicked.connect(self.engageNippleOff)
             buttonsList.append(buttonNippleOff)
-            # button: stylus proximity on
-            buttonStylusProximityControlOn = QtGui.QPushButton('stylus proximity on', self)
+            # button: stylus proximity monitoring on
+            buttonStylusProximityControlOn = QtGui.QPushButton('stylus proximity monitoring on', self)
             buttonStylusProximityControlOn.clicked.connect(self.engageStylusProximityControlOn)
             buttonsList.append(buttonStylusProximityControlOn)
-            # button: stylus proximity off
-            buttonStylusProximityControlOff = QtGui.QPushButton('stylus proximity off', self)
+            # button: stylus proximity monitoring off
+            buttonStylusProximityControlOff = QtGui.QPushButton('stylus proximity monitoring off', self)
             buttonStylusProximityControlOff.clicked.connect(self.engageStylusProximityControlOff)
             buttonsList.append(buttonStylusProximityControlOff)
+            # button: display position monitoring on
+            buttonDisplayPositionControlOn = QtGui.QPushButton('display position monitoring on', self)
+            buttonDisplayPositionControlOn.clicked.connect(self.engageDisplayPositionControlOn)
+            buttonsList.append(buttonDisplayPositionControlOn)
+            # button: display position monitoring off
+            buttonDisplayPositionControlOff = QtGui.QPushButton('display position monitoring off', self)
+            buttonDisplayPositionControlOff.clicked.connect(self.engageDisplayPositionControlOff)
+            buttonsList.append(buttonDisplayPositionControlOff)
             # set button dimensions
-            buttonsWidth=150
+            buttonsWidth=250
             buttonsHeight=50
             for button in buttonsList:
                 button.setFixedSize(buttonsWidth, buttonsHeight)
@@ -149,6 +161,7 @@ class interface(QtGui.QWidget):
     def closeEvent(self, event):
         logger.info("stopping spin")
         self.stylusProximityControlOff()
+	self.engageDisplayPositionControlOff()
         self.deleteLater() 
     def displayLeft(self):
         logger.info("changing display to left")
@@ -193,25 +206,49 @@ class interface(QtGui.QWidget):
         logger.info("changing nipple to off")
         os.system('xinput disable "TPPS/2 IBM TrackPoint"')
     def stylusProximityControl(self):
-        previousProximityStatus = None
+        self.previousStylusProximityStatus = None
         while True:
-            proximityCommand = 'xinput query-state "Wacom ISDv4 EC Pen stylus" | grep Proximity | cut -d " " -f3 | cut -d "=" -f2'
-            proximityStatus = subprocess.check_output(proximityCommand, shell=True).lower().rstrip()
-            if (proximityStatus == "out") and (previousProximityStatus != "out"):
+            stylusProximityCommand = 'xinput query-state "Wacom ISDv4 EC Pen stylus" | grep Proximity | cut -d " " -f3 | cut -d "=" -f2'
+            self.stylusProximityStatus = subprocess.check_output(stylusProximityCommand, shell=True).lower().rstrip()
+            if (self.stylusProximityStatus == "out") and (self.previousStylusProximityStatus != "out"):
                 logger.info("stylus inactive")
 		self.touchscreenOn()
-            elif (proximityStatus == "in") and (previousProximityStatus != "in"):
+            elif (self.stylusProximityStatus == "in") and (self.previousStylusProximityStatus != "in"):
                 logger.info("stylus active")
 		self.touchscreenOff()
-	    previousProximityStatus = proximityStatus
+	    self.previousStylusProximityStatus = self.stylusProximityStatus
             time.sleep(0.25)
     def stylusProximityControlOn(self):
         logger.info("changing stylus proximity control to on")
-	self.process1 = Process(target=self.stylusProximityControl)
-	self.process1.start()
+	self.processStylusProximityControl = Process(target=self.stylusProximityControl)
+	self.processStylusProximityControl.start()
     def stylusProximityControlOff(self):
         logger.info("changing stylus proximity control to off")
-	self.process1.terminate()
+	self.processStylusProximityControl.terminate()
+    def displayPositionControl(self):
+        socketACPI = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        socketACPI.connect("/var/run/acpid.socket")
+	logger.info("display position is {a1}".format(a1=self.displayPositionStatus))
+	while True:
+            eventACPI = socketACPI.recv(4096)
+            if eventACPI == 'ibm/hotkey HKEY 00000080 000060c0\n':
+                logger.info("display position change")
+                if self.displayPositionStatus == "laptop":
+                    self.engageModeTablet()
+		    self.displayPositionStatus = "tablet"
+		    logger.info("display position is {a1}".format(a1=self.displayPositionStatus))
+		elif self.displayPositionStatus == "tablet":
+                    self.engageModeLaptop()
+		    self.displayPositionStatus = "laptop"
+		    logger.info("display position is {a1}".format(a1=self.displayPositionStatus))
+            time.sleep(0.25)
+    def displayPositionControlOn(self):
+        logger.info("changing display position control to on")
+	self.processDisplayPositionControl = Process(target=self.displayPositionControl)
+	self.processDisplayPositionControl.start()
+    def displayPositionControlOff(self):
+        logger.info("changing display position control to off")
+	self.processDisplayPositionControl.terminate()
     def engageModeTablet(self):
         logger.info("engaging mode tablet")
         self.displayLeft()
@@ -257,6 +294,10 @@ class interface(QtGui.QWidget):
         self.stylusProximityControlOn()
     def engageStylusProximityControlOff(self):
         self.stylusProximityControlOff()
+    def engageDisplayPositionControlOn(self):
+        self.displayPositionControlOn()
+    def engageDisplayPositionControlOff(self):
+        self.displayPositionControlOff()
 def main(docopt_args):
     application = QtGui.QApplication(sys.argv)
     interface1 = interface(docopt_args)
