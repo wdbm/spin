@@ -15,7 +15,7 @@ Options:
 #                                                                              #
 # spin                                                                         #
 #                                                                              #
-# version: 2014-01-09T0119                                                     #
+# version: 2014-06-17T1224                                                     #
 #                                                                              #
 ################################################################################
 #                                                                              #
@@ -231,7 +231,11 @@ class interface(QtGui.QWidget):
 	logger.info("display position is {a1}".format(a1=self.displayPositionStatus))
 	while True:
             eventACPI = socketACPI.recv(4096)
-            if eventACPI == 'ibm/hotkey HKEY 00000080 000060c0\n':
+	    # Ubuntu 13.10 compatibility:
+            #eventACPIDisplayPositionChange = 'ibm/hotkey HKEY 00000080 000060c0\n'
+	    # Ubuntu 14.04 compatibility:
+            eventACPIDisplayPositionChange = 'ibm/hotkey LEN0068:00 00000080 000060c0\n'
+            if eventACPI == eventACPIDisplayPositionChange:
                 logger.info("display position change")
                 if self.displayPositionStatus == "laptop":
                     self.engageModeTablet()
