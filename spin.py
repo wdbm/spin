@@ -1,21 +1,9 @@
 #!/usr/bin/env python
 
 """
-spin, a small utility to assist in setting usage modes of laptop-tablet devices
-
-Usage:
-    spin.py
-    spin.py -h | --help
-    spin.py --nogui
-Options:
-    -h,--help      : show this help message
-    --nogui        : non-GUI mode
-"""
 ################################################################################
 #                                                                              #
 # spin                                                                         #
-#                                                                              #
-# version: 2014-06-17T1224                                                     #
 #                                                                              #
 ################################################################################
 #                                                                              #
@@ -36,7 +24,7 @@ Options:
 #                                                                              #
 # This program is distributed in the hope that it will be useful, but WITHOUT  #
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or        #
-# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for    #
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for     #
 # more details.                                                                #
 #                                                                              #
 # For a copy of the GNU General Public License, see                            #
@@ -44,35 +32,43 @@ Options:
 #                                                                              #
 ################################################################################
 
-from docopt import docopt
+Usage:
+    spin.py [options]
+
+Options:
+    -h,--help   Show this help message.
+    --version   Show the version and exit.
+    --nogui     non-GUI mode
+"""
+
+name    = "spin"
+version = "2014-12-08T2002Z"
+
 import os
 import sys
 import subprocess
-from multiprocessing import Process
+import multiprocessing
 import socket
 import time
-from PyQt4 import QtGui
 import logging
-
-# logging
-logger = logging.getLogger(__name__)
-logging.basicConfig()
-logger.level = logging.INFO
+from   PyQt4 import QtGui
+from   docopt import docopt
 
 class interface(QtGui.QWidget):
+
     def __init__(
         self,
-        docopt_args=None
-	):
-        self.docopt_args=docopt_args
+        options = None
+        ):
+        self.options = options
         super(interface, self).__init__()
-        logger.info("running spin")
+        log.info("running spin")
         # engage stylus proximity control
         self.stylusProximityControlOn()
-	# engage display position control
-	self.displayPositionStatus = "laptop"
+        # engage display position control
+        self.displayPositionStatus = "laptop"
         self.displayPositionControlOn()
-        if not docopt_args["--nogui"]:
+        if not options["--nogui"]:
             # create buttons
             buttonsList = []
             # button: tablet mode
@@ -140,8 +136,8 @@ class interface(QtGui.QWidget):
             buttonDisplayPositionControlOff.clicked.connect(self.engageDisplayPositionControlOff)
             buttonsList.append(buttonDisplayPositionControlOff)
             # set button dimensions
-            buttonsWidth=250
-            buttonsHeight=50
+            buttonsWidth = 250
+            buttonsHeight = 50
             for button in buttonsList:
                 button.setFixedSize(buttonsWidth, buttonsHeight)
             # set layout
@@ -152,134 +148,134 @@ class interface(QtGui.QWidget):
                 vbox.addStretch(1)	
             self.setLayout(vbox)
             # window
-	    self.setWindowTitle('spin')
+            self.setWindowTitle('spin')
             # set window position
-	    self.move(0, 0)
+            self.move(0, 0)
             self.show()
-	elif docopt_args["--nogui"]:
-            logger.info("non-GUI mode")
+        elif options["--nogui"]:
+            log.info("non-GUI mode")
     def closeEvent(self, event):
-        logger.info("stopping spin")
+        log.info("stopping spin")
         self.stylusProximityControlOff()
-	self.engageDisplayPositionControlOff()
+        self.engageDisplayPositionControlOff()
         self.deleteLater() 
     def displayLeft(self):
-        logger.info("changing display to left")
+        log.info("changing display to left")
         os.system('xrandr -o left')
     def displayRight(self):
-        logger.info("changing display to right")
+        log.info("changing display to right")
         os.system('xrandr -o right')
     def displayInverted(self):
-        logger.info("changing display to inverted")
+        log.info("changing display to inverted")
         os.system('xrandr -o inverted')
     def displayNormal(self):
-        logger.info("changing display to normal")
+        log.info("changing display to normal")
         os.system('xrandr -o normal')
     def touchscreenLeft(self):
-        logger.info("changing touchscreen to left")
+        log.info("changing touchscreen to left")
         os.system('xinput set-prop "ELAN Touchscreen" "Coordinate Transformation Matrix" 0 -1 1 1 0 0 0 0 1')
     def touchscreenRight(self):
-        logger.info("changing touchscreen to right")
+        log.info("changing touchscreen to right")
         os.system('xinput set-prop "ELAN Touchscreen" "Coordinate Transformation Matrix" 0 1 0 -1 0 1 0 0 1')
     def touchscreenInverted(self):
-        logger.info("changing touchscreen to inverted")
+        log.info("changing touchscreen to inverted")
         os.system('xinput set-prop "ELAN Touchscreen" "Coordinate Transformation Matrix" -1 0 1 0 -1 1 0 0 1')
     def touchscreenNormal(self):
-        logger.info("changing touchscreen to normal")
+        log.info("changing touchscreen to normal")
         os.system('xinput set-prop "ELAN Touchscreen" "Coordinate Transformation Matrix" 1 0 0 0 1 0 0 0 1')
     def touchscreenOn(self):
-        logger.info("changing touchscreen to on")
+        log.info("changing touchscreen to on")
         os.system('xinput enable "ELAN Touchscreen"')
     def touchscreenOff(self):
-        logger.info("changing touchscreen to off")
+        log.info("changing touchscreen to off")
         os.system('xinput disable "ELAN Touchscreen"')
     def touchpadOn(self):
-        logger.info("changing touchpad to on")
+        log.info("changing touchpad to on")
         os.system('xinput enable "SynPS/2 Synaptics TouchPad"')
     def touchpadOff(self):
-        logger.info("changing touchpad to off")
+        log.info("changing touchpad to off")
         os.system('xinput disable "SynPS/2 Synaptics TouchPad"')
     def nippleOn(self):
-        logger.info("changing nipple to on")
+        log.info("changing nipple to on")
         os.system('xinput enable "TPPS/2 IBM TrackPoint"')
     def nippleOff(self):
-        logger.info("changing nipple to off")
+        log.info("changing nipple to off")
         os.system('xinput disable "TPPS/2 IBM TrackPoint"')
     def stylusProximityControl(self):
         self.previousStylusProximityStatus = None
         while True:
             stylusProximityCommand = 'xinput query-state "Wacom ISDv4 EC Pen stylus" | grep Proximity | cut -d " " -f3 | cut -d "=" -f2'
-            self.stylusProximityStatus = subprocess.check_output(stylusProximityCommand, shell=True).lower().rstrip()
+            self.stylusProximityStatus = subprocess.check_output(stylusProximityCommand, shell = True).lower().rstrip()
             if (self.stylusProximityStatus == "out") and (self.previousStylusProximityStatus != "out"):
-                logger.info("stylus inactive")
-		self.touchscreenOn()
+                log.info("stylus inactive")
+                self.touchscreenOn()
             elif (self.stylusProximityStatus == "in") and (self.previousStylusProximityStatus != "in"):
-                logger.info("stylus active")
-		self.touchscreenOff()
-	    self.previousStylusProximityStatus = self.stylusProximityStatus
+                log.info("stylus active")
+                self.touchscreenOff()
+            self.previousStylusProximityStatus = self.stylusProximityStatus
             time.sleep(0.25)
     def stylusProximityControlOn(self):
-        logger.info("changing stylus proximity control to on")
-	self.processStylusProximityControl = Process(target=self.stylusProximityControl)
-	self.processStylusProximityControl.start()
+        log.info("changing stylus proximity control to on")
+        self.processStylusProximityControl = multiprocessing.Process(target = self.stylusProximityControl)
+        self.processStylusProximityControl.start()
     def stylusProximityControlOff(self):
-        logger.info("changing stylus proximity control to off")
-	self.processStylusProximityControl.terminate()
+        log.info("changing stylus proximity control to off")
+        self.processStylusProximityControl.terminate()
     def displayPositionControl(self):
         socketACPI = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         socketACPI.connect("/var/run/acpid.socket")
-	logger.info("display position is {a1}".format(a1=self.displayPositionStatus))
-	while True:
+        log.info("display position is {displayPositionStatus}".format(displayPositionStatus = self.displayPositionStatus))
+        while True:
             eventACPI = socketACPI.recv(4096)
-	    # Ubuntu 13.10 compatibility:
+            # Ubuntu 13.10 compatibility:
             #eventACPIDisplayPositionChange = 'ibm/hotkey HKEY 00000080 000060c0\n'
-	    # Ubuntu 14.04 compatibility:
+            # Ubuntu 14.04 compatibility:
             eventACPIDisplayPositionChange = 'ibm/hotkey LEN0068:00 00000080 000060c0\n'
             if eventACPI == eventACPIDisplayPositionChange:
-                logger.info("display position change")
+                log.info("display position change")
                 if self.displayPositionStatus == "laptop":
                     self.engageModeTablet()
-		    self.displayPositionStatus = "tablet"
-		    logger.info("display position is {a1}".format(a1=self.displayPositionStatus))
-		elif self.displayPositionStatus == "tablet":
+                    self.displayPositionStatus = "tablet"
+                    log.info("display position is {displayPositionStatus}".format(displayPositionStatus = self.displayPositionStatus))
+                elif self.displayPositionStatus == "tablet":
                     self.engageModeLaptop()
-		    self.displayPositionStatus = "laptop"
-		    logger.info("display position is {a1}".format(a1=self.displayPositionStatus))
+                    self.displayPositionStatus = "laptop"
+                    log.info("display position is {displayPositionStatus}".format(displayPositionStatus = self.displayPositionStatus))
             time.sleep(0.25)
     def displayPositionControlOn(self):
-        logger.info("changing display position control to on")
-	self.processDisplayPositionControl = Process(target=self.displayPositionControl)
-	self.processDisplayPositionControl.start()
+        log.info("changing display position control to on")
+        self.processDisplayPositionControl = multiprocessing.Process(target = self.displayPositionControl)
+        self.processDisplayPositionControl.start()
     def displayPositionControlOff(self):
-        logger.info("changing display position control to off")
-	self.processDisplayPositionControl.terminate()
+        log.info("changing display position control to off")
+        self.processDisplayPositionControl.terminate()
     def engageModeTablet(self):
-        logger.info("engaging mode tablet")
+        log.info("engaging mode tablet")
         self.displayLeft()
-	self.touchscreenLeft()
+        self.touchscreenLeft()
         self.touchpadOff()
         self.nippleOff()
     def engageModeLaptop(self):
-        logger.info("engaging mode laptop")
+        log.info("engaging mode laptop")
         self.displayNormal()
         self.touchscreenNormal()
         self.touchscreenOn()
         self.touchpadOn()
         self.nippleOn()
     def engageLeft(self):
-        logger.info("engaging mode left")
+        log.info("engaging mode left")
         self.displayLeft()
         self.touchscreenLeft()
     def engageRight(self):
-        logger.info("engaging mode right")
+        log.info("engaging mode right")
         self.displayRight()
         self.touchscreenRight()
     def engageInverted(self):
-        logger.info("engaging mode inverted")
+        log.info("engaging mode inverted")
         self.displayInverted()
         self.touchscreenInverted()
     def engageNormal(self):
-        logger.info("engaging mode normal")
+        log.info("engaging mode normal")
         self.displayNormal()
         self.touchscreenNormal()
     def engageTouchscreenOn(self):
@@ -302,10 +298,23 @@ class interface(QtGui.QWidget):
         self.displayPositionControlOn()
     def engageDisplayPositionControlOff(self):
         self.displayPositionControlOff()
-def main(docopt_args):
+
+def main(options):
+
+    # logging
+    logging.basicConfig()
+    global log
+    log       = logging.getLogger(__name__)
+    log.level = logging.INFO
+
     application = QtGui.QApplication(sys.argv)
-    interface1 = interface(docopt_args)
+    interface1  = interface(options)
     sys.exit(application.exec_())
+
 if __name__ == '__main__':
-    args = docopt(__doc__)
-    main(args)
+
+    options = docopt(__doc__)
+    if options["--version"]:
+        print(version)
+        exit()
+    main(options)
