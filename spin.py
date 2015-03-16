@@ -36,13 +36,42 @@ Usage:
     spin.py [options]
 
 Options:
-    -h,--help   Show this help message.
-    --version   Show the version and exit.
-    --nogui     non-GUI mode
+    -h,--help        display help message
+    --version        display version and exit
+    --nogui          non-GUI mode
+    --debugpassive   display commands without executing
 """
 
 name    = "spin"
-version = "2014-12-08T2002Z"
+version = "2015-03-16T2207Z"
+
+import imp
+import urllib
+
+def smuggle(
+    moduleName = None,
+    URL        = None
+    ):
+    if moduleName is None:
+        moduleName = URL
+    try:
+        module = __import__(moduleName)
+        return(module)
+    except:
+        try:
+            moduleString = urllib.urlopen(URL).read()
+            module = imp.new_module("module")
+            exec moduleString in module.__dict__
+            return(module)
+        except: 
+            raise(
+                Exception(
+                    "module {moduleName} import error".format(
+                        moduleName = moduleName
+                    )
+                )
+            )
+            sys.exit()
 
 import os
 import sys
@@ -52,7 +81,10 @@ import socket
 import time
 import logging
 from   PyQt4 import QtGui
-from   docopt import docopt
+docopt = smuggle(
+    moduleName = "docopt",
+    URL = "https://rawgit.com/docopt/docopt/master/docopt.py"
+)
 
 class interface(QtGui.QWidget):
 
@@ -62,81 +94,160 @@ class interface(QtGui.QWidget):
         ):
         self.options = options
         super(interface, self).__init__()
-        log.info("running spin")
+        log.info("run spin")
         # engage stylus proximity control
-        self.stylusProximityControlOn()
+        self.stylusProximityControlSwitch(status = "on")
         # engage display position control
         self.displayPositionStatus = "laptop"
-        self.displayPositionControlOn()
+        self.displayPositionControlSwitch(status = "on")
         if not options["--nogui"]:
             # create buttons
             buttonsList = []
             # button: tablet mode
-            buttonModeTablet = QtGui.QPushButton('tablet mode', self)
-            buttonModeTablet.clicked.connect(self.engageModeTablet)
+            buttonModeTablet = QtGui.QPushButton(
+                "tablet mode",
+                self
+            )
+            buttonModeTablet.clicked.connect(
+                lambda: self.engageMode(mode = "tablet")
+            )
             buttonsList.append(buttonModeTablet)
             # button: laptop mode
-            buttonModeLaptop = QtGui.QPushButton('laptop mode', self)
-            buttonModeLaptop.clicked.connect(self.engageModeLaptop)
+            buttonModeLaptop = QtGui.QPushButton(
+                "laptop mode",
+                self
+            )
+            buttonModeLaptop.clicked.connect(
+                lambda: self.engageMode(mode = "laptop")
+            )
             buttonsList.append(buttonModeLaptop)
             # button: left
-            buttonLeft = QtGui.QPushButton('left', self)
-            buttonLeft.clicked.connect(self.engageLeft)
+            buttonLeft = QtGui.QPushButton(
+                "left",
+                self
+            )
+            buttonLeft.clicked.connect(
+                lambda: self.engageMode(mode = "left")
+            )
             buttonsList.append(buttonLeft)
             # button: right
-            buttonRight = QtGui.QPushButton('right', self)
-            buttonRight.clicked.connect(self.engageRight)
+            buttonRight = QtGui.QPushButton(
+                "right", self
+            )
+            buttonRight.clicked.connect(
+                lambda: self.engageMode(mode = "right")
+            )
             buttonsList.append(buttonRight)
             # button: inverted
-            buttonInverted = QtGui.QPushButton('inverted', self)
-            buttonInverted.clicked.connect(self.engageInverted)
+            buttonInverted = QtGui.QPushButton(
+                "inverted",
+                self
+            )
+            buttonInverted.clicked.connect(
+                lambda: self.engageMode(mode = "inverted")
+            )
             buttonsList.append(buttonInverted)
             # button: normal
-            buttonNormal = QtGui.QPushButton('normal', self)
-            buttonNormal.clicked.connect(self.engageNormal)
+            buttonNormal = QtGui.QPushButton(
+                "normal",
+                self
+            )
+            buttonNormal.clicked.connect(
+                lambda: self.engageMode(mode = "normal")
+            )
             buttonsList.append(buttonNormal)
             # button: touchscreen on
-            buttonTouchscreenOn = QtGui.QPushButton('touchscreen on', self)
-            buttonTouchscreenOn.clicked.connect(self.engageTouchscreenOn)
+            buttonTouchscreenOn = QtGui.QPushButton(
+                "touchscreen on",
+                self
+            )
+            buttonTouchscreenOn.clicked.connect(
+                lambda: self.touchscreenSwitch(status = "on")
+            )
             buttonsList.append(buttonTouchscreenOn)
             # button: touchscreen off
-            buttonTouchscreenOff = QtGui.QPushButton('touchscreen off', self)
-            buttonTouchscreenOff.clicked.connect(self.engageTouchscreenOff)
+            buttonTouchscreenOff = QtGui.QPushButton(
+                "touchscreen off",
+                self
+            )
+            buttonTouchscreenOff.clicked.connect(
+                lambda: self.touchscreenSwitch(status = "off")
+            )
             buttonsList.append(buttonTouchscreenOff)
             # button: touchpad on
-            buttonTouchpadOn = QtGui.QPushButton('touchpad on', self)
-            buttonTouchpadOn.clicked.connect(self.engageTouchpadOn)
+            buttonTouchpadOn = QtGui.QPushButton(
+                "touchpad on",
+                self
+            )
+            buttonTouchpadOn.clicked.connect(
+                lambda: self.touchpadSwitch(status = "on")
+            )
             buttonsList.append(buttonTouchpadOn)
             # button: touchpad off
-            buttonTouchpadOff = QtGui.QPushButton('touchpad off', self)
-            buttonTouchpadOff.clicked.connect(self.engageTouchpadOff)
+            buttonTouchpadOff = QtGui.QPushButton(
+                "touchpad off",
+                self
+            )
+            buttonTouchpadOff.clicked.connect(
+                lambda: self.touchpadSwitch(status = "off")
+            )
             buttonsList.append(buttonTouchpadOff)
             # button: nipple on
-            buttonNippleOn = QtGui.QPushButton('nipple on', self)
-            buttonNippleOn.clicked.connect(self.engageNippleOn)
+            buttonNippleOn = QtGui.QPushButton(
+                "nipple on",
+                self
+            )
+            buttonNippleOn.clicked.connect(
+                lambda: self.nippleSwitch(status = "on")
+            )
             buttonsList.append(buttonNippleOn)
             # button: nipple off
-            buttonNippleOff = QtGui.QPushButton('nipple off', self)
-            buttonNippleOff.clicked.connect(self.engageNippleOff)
+            buttonNippleOff = QtGui.QPushButton(
+                "nipple off",
+                self
+            )
+            buttonNippleOff.clicked.connect(
+                lambda: self.nippleSwitch(status = "off")
+            )
             buttonsList.append(buttonNippleOff)
             # button: stylus proximity monitoring on
-            buttonStylusProximityControlOn = QtGui.QPushButton('stylus proximity monitoring on', self)
-            buttonStylusProximityControlOn.clicked.connect(self.engageStylusProximityControlOn)
+            buttonStylusProximityControlOn = QtGui.QPushButton(
+                "stylus proximity monitoring on",
+                self
+            )
+            buttonStylusProximityControlOn.clicked.connect(
+                lambda: self.stylusProximityControlSwitch(status = "on")
+            )
             buttonsList.append(buttonStylusProximityControlOn)
             # button: stylus proximity monitoring off
-            buttonStylusProximityControlOff = QtGui.QPushButton('stylus proximity monitoring off', self)
-            buttonStylusProximityControlOff.clicked.connect(self.engageStylusProximityControlOff)
+            buttonStylusProximityControlOff = QtGui.QPushButton(
+                "stylus proximity monitoring off",
+                self
+            )
+            buttonStylusProximityControlOff.clicked.connect(
+                lambda: self.stylusProximityControlSwitch(status = "off")
+            )
             buttonsList.append(buttonStylusProximityControlOff)
             # button: display position monitoring on
-            buttonDisplayPositionControlOn = QtGui.QPushButton('display position monitoring on', self)
-            buttonDisplayPositionControlOn.clicked.connect(self.engageDisplayPositionControlOn)
+            buttonDisplayPositionControlOn = QtGui.QPushButton(
+                "display position monitoring on",
+                self
+            )
+            buttonDisplayPositionControlOn.clicked.connect(
+                lambda: self.displayPositionControlSwitch(status = "on")
+            )
             buttonsList.append(buttonDisplayPositionControlOn)
             # button: display position monitoring off
-            buttonDisplayPositionControlOff = QtGui.QPushButton('display position monitoring off', self)
-            buttonDisplayPositionControlOff.clicked.connect(self.engageDisplayPositionControlOff)
+            buttonDisplayPositionControlOff = QtGui.QPushButton(
+                "display position monitoring off",
+                self
+            )
+            buttonDisplayPositionControlOff.clicked.connect(
+                lambda: self.displayPositionControlSwitch(status = "off")
+            )
             buttonsList.append(buttonDisplayPositionControlOff)
             # set button dimensions
-            buttonsWidth = 250
+            buttonsWidth  = 250
             buttonsHeight = 50
             for button in buttonsList:
                 button.setFixedSize(buttonsWidth, buttonsHeight)
@@ -148,7 +259,7 @@ class interface(QtGui.QWidget):
                 vbox.addStretch(1)	
             self.setLayout(vbox)
             # window
-            self.setWindowTitle('spin')
+            self.setWindowTitle("spin")
             # set window position
             self.move(0, 0)
             self.show()
@@ -156,148 +267,266 @@ class interface(QtGui.QWidget):
             log.info("non-GUI mode")
     def closeEvent(self, event):
         log.info("stopping spin")
-        self.stylusProximityControlOff()
-        self.engageDisplayPositionControlOff()
+        self.stylusProximityControlSwitch(status = "off")
+        self.displayPositionControlSwitch(status = "off")
         self.deleteLater() 
-    def displayLeft(self):
-        log.info("changing display to left")
-        os.system('xrandr -o left')
-    def displayRight(self):
-        log.info("changing display to right")
-        os.system('xrandr -o right')
-    def displayInverted(self):
-        log.info("changing display to inverted")
-        os.system('xrandr -o inverted')
-    def displayNormal(self):
-        log.info("changing display to normal")
-        os.system('xrandr -o normal')
-    def touchscreenLeft(self):
-        log.info("changing touchscreen to left")
-        os.system('xinput set-prop "ELAN Touchscreen" "Coordinate Transformation Matrix" 0 -1 1 1 0 0 0 0 1')
-    def touchscreenRight(self):
-        log.info("changing touchscreen to right")
-        os.system('xinput set-prop "ELAN Touchscreen" "Coordinate Transformation Matrix" 0 1 0 -1 0 1 0 0 1')
-    def touchscreenInverted(self):
-        log.info("changing touchscreen to inverted")
-        os.system('xinput set-prop "ELAN Touchscreen" "Coordinate Transformation Matrix" -1 0 1 0 -1 1 0 0 1')
-    def touchscreenNormal(self):
-        log.info("changing touchscreen to normal")
-        os.system('xinput set-prop "ELAN Touchscreen" "Coordinate Transformation Matrix" 1 0 0 0 1 0 0 0 1')
-    def touchscreenOn(self):
-        log.info("changing touchscreen to on")
-        os.system('xinput enable "ELAN Touchscreen"')
-    def touchscreenOff(self):
-        log.info("changing touchscreen to off")
-        os.system('xinput disable "ELAN Touchscreen"')
-    def touchpadOn(self):
-        log.info("changing touchpad to on")
-        os.system('xinput enable "SynPS/2 Synaptics TouchPad"')
-    def touchpadOff(self):
-        log.info("changing touchpad to off")
-        os.system('xinput disable "SynPS/2 Synaptics TouchPad"')
-    def nippleOn(self):
-        log.info("changing nipple to on")
-        os.system('xinput enable "TPPS/2 IBM TrackPoint"')
-    def nippleOff(self):
-        log.info("changing nipple to off")
-        os.system('xinput disable "TPPS/2 IBM TrackPoint"')
+    def displayOrientation(
+        self,
+        orientation = None
+        ):
+        if orientation in ["left", "right", "inverted", "normal"]:
+            log.info("change display to {orientation}".format(
+                orientation = orientation
+            ))
+            engageCommand(
+                "xrandr -o {orientation}".format(
+                    orientation = orientation
+                )
+            )
+        else:
+            log.error(
+                "unknown display orientation \"{orientation}\" "
+                "requested".format(
+                    orientation = orientation
+                )
+            )
+            sys.exit()
+    def touchscreenOrientation(
+        self,
+        orientation = None
+        ):
+        coordinateTransformationMatrix = {
+            "left":     "0 -1 1 1 0 0 0 0 1",
+            "right":    "0 1 0 -1 0 1 0 0 1",
+            "inverted": "-1 0 1 0 -1 1 0 0 1",
+            "normal":   "1 0 0 0 1 0 0 0 1"
+        }
+        if coordinateTransformationMatrix.has_key(orientation):
+            log.info("change touchscreen to {orientation}".format(
+                orientation = orientation
+            ))
+            engageCommand(
+                "xinput set-prop \"ELAN Touchscreen\" \"Coordinate "
+                "Transformation Matrix\" "
+                "{matrix}".format(
+                    matrix = coordinateTransformationMatrix[orientation]
+                )
+            )
+        else:
+            log.error(
+                "unknown touchscreen orientation \"{orientation}\""
+                " requested".format(
+                    orientation = orientation
+                )
+            )
+            sys.exit()
+    def touchscreenSwitch(
+        self,
+        status = None
+        ):
+        xinputStatus = {
+            "on":  "enable",
+            "off": "disable"
+        }
+        if xinputStatus.has_key(status):
+            log.info("change touchscreen to {status}".format(
+                status = status
+            ))
+            engageCommand(
+                "xinput {status} \"ELAN Touchscreen\"".format(
+                    status = xinputStatus[status]
+                )
+            )
+        else:
+            log.error(
+                "unknown touchscreen status \"{orientation}\" requested".format(
+                    status = status
+                )
+            )
+            sys.exit()
+    def touchpadSwitch(
+        self,
+        status = None
+        ):
+        xinputStatus = {
+            "on":  "enable",
+            "off": "disable"
+        }
+        if xinputStatus.has_key(status):
+            log.info("change touchpad to {status}".format(
+                status = status
+            ))
+            engageCommand(
+                "xinput {status} \"SynPS/2 Synaptics TouchPad\"".format(
+                    status = xinputStatus[status]
+                )
+            )
+        else:
+            log.error(
+                "unknown touchpad status \"{orientation}\" requested".format(
+                    status = status
+                )
+            )
+            sys.exit()
+    def nippleSwitch(
+        self,
+        status = None
+        ):
+        xinputStatus = {
+            "on":  "enable",
+            "off": "disable"
+        }
+        if xinputStatus.has_key(status):
+            log.info("change nipple to {status}".format(
+                status = status
+            ))
+            engageCommand(
+                "xinput {status} \"TPPS/2 IBM TrackPoint\"".format(
+                    status = xinputStatus[status]
+                )
+            )
+        else:
+            log.error(
+                "unknown nipple status \"{orientation}\" requested".format(
+                    status = status
+                )
+            )
+            sys.exit()
     def stylusProximityControl(self):
         self.previousStylusProximityStatus = None
         while True:
-            stylusProximityCommand = 'xinput query-state "Wacom ISDv4 EC Pen stylus" | grep Proximity | cut -d " " -f3 | cut -d "=" -f2'
-            self.stylusProximityStatus = subprocess.check_output(stylusProximityCommand, shell = True).lower().rstrip()
-            if (self.stylusProximityStatus == "out") and (self.previousStylusProximityStatus != "out"):
+            stylusProximityCommand = "xinput query-state " + \
+                                     "\"Wacom ISDv4 EC Pen stylus\" | " + \
+                                     "grep Proximity | cut -d \" \" -f3 | " + \
+                                     " cut -d \"=\" -f2"
+            self.stylusProximityStatus = subprocess.check_output(
+                stylusProximityCommand,
+                shell = True
+            ).lower().rstrip()
+            if \
+                (self.stylusProximityStatus == "out") and \
+                (self.previousStylusProximityStatus != "out"):
                 log.info("stylus inactive")
-                self.touchscreenOn()
-            elif (self.stylusProximityStatus == "in") and (self.previousStylusProximityStatus != "in"):
+                self.touchscreenSwitch(status = "on")
+            elif \
+                (self.stylusProximityStatus == "in") and \
+                (self.previousStylusProximityStatus != "in"):
                 log.info("stylus active")
-                self.touchscreenOff()
+                self.touchscreenSwitch(status = "off")
             self.previousStylusProximityStatus = self.stylusProximityStatus
             time.sleep(0.25)
-    def stylusProximityControlOn(self):
-        log.info("changing stylus proximity control to on")
-        self.processStylusProximityControl = multiprocessing.Process(target = self.stylusProximityControl)
-        self.processStylusProximityControl.start()
-    def stylusProximityControlOff(self):
-        log.info("changing stylus proximity control to off")
-        self.processStylusProximityControl.terminate()
+    def stylusProximityControlSwitch(
+        self,
+        status = None
+        ):
+        if status == "on":
+            log.info("change stylus proximity control to on")
+            self.processStylusProximityControl = multiprocessing.Process(
+                target = self.stylusProximityControl
+            )
+            self.processStylusProximityControl.start()
+        elif status == "off":
+            log.info("change stylus proximity control to off")
+            self.processStylusProximityControl.terminate()
+        else:
+            log.error(
+                "unknown stylus proximity control status \"{orientation}\" "
+                "requested".format(
+                    status = status
+                )
+            )
+            sys.exit()
     def displayPositionControl(self):
         socketACPI = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         socketACPI.connect("/var/run/acpid.socket")
-        log.info("display position is {displayPositionStatus}".format(displayPositionStatus = self.displayPositionStatus))
+        log.info("display position is {displayPositionStatus}".format(
+            displayPositionStatus = self.displayPositionStatus
+            )
+        )
         while True:
             eventACPI = socketACPI.recv(4096)
             # Ubuntu 13.10 compatibility:
-            #eventACPIDisplayPositionChange = 'ibm/hotkey HKEY 00000080 000060c0\n'
+            #eventACPIDisplayPositionChange = \
+            #    "ibm/hotkey HKEY 00000080 000060c0\n"
             # Ubuntu 14.04 compatibility:
-            eventACPIDisplayPositionChange = 'ibm/hotkey LEN0068:00 00000080 000060c0\n'
+            eventACPIDisplayPositionChange = \
+                "ibm/hotkey LEN0068:00 00000080 000060c0\n"
             if eventACPI == eventACPIDisplayPositionChange:
                 log.info("display position change")
                 if self.displayPositionStatus == "laptop":
-                    self.engageModeTablet()
+                    self.engageMode(mode = "tablet")
                     self.displayPositionStatus = "tablet"
-                    log.info("display position is {displayPositionStatus}".format(displayPositionStatus = self.displayPositionStatus))
+                    log.info(
+                        "display position is {displayPositionStatus}".format(
+                            displayPositionStatus = self.displayPositionStatus
+                        )
+                    )
                 elif self.displayPositionStatus == "tablet":
-                    self.engageModeLaptop()
+                    self.engageMode(mode = "laptop")
                     self.displayPositionStatus = "laptop"
-                    log.info("display position is {displayPositionStatus}".format(displayPositionStatus = self.displayPositionStatus))
+                    log.info(
+                        "display position is {displayPositionStatus}".format(
+                            displayPositionStatus = self.displayPositionStatus
+                        )
+                    )
             time.sleep(0.25)
-    def displayPositionControlOn(self):
-        log.info("changing display position control to on")
-        self.processDisplayPositionControl = multiprocessing.Process(target = self.displayPositionControl)
-        self.processDisplayPositionControl.start()
-    def displayPositionControlOff(self):
-        log.info("changing display position control to off")
-        self.processDisplayPositionControl.terminate()
-    def engageModeTablet(self):
-        log.info("engaging mode tablet")
-        self.displayLeft()
-        self.touchscreenLeft()
-        self.touchpadOff()
-        self.nippleOff()
-    def engageModeLaptop(self):
-        log.info("engaging mode laptop")
-        self.displayNormal()
-        self.touchscreenNormal()
-        self.touchscreenOn()
-        self.touchpadOn()
-        self.nippleOn()
-    def engageLeft(self):
-        log.info("engaging mode left")
-        self.displayLeft()
-        self.touchscreenLeft()
-    def engageRight(self):
-        log.info("engaging mode right")
-        self.displayRight()
-        self.touchscreenRight()
-    def engageInverted(self):
-        log.info("engaging mode inverted")
-        self.displayInverted()
-        self.touchscreenInverted()
-    def engageNormal(self):
-        log.info("engaging mode normal")
-        self.displayNormal()
-        self.touchscreenNormal()
-    def engageTouchscreenOn(self):
-        self.touchscreenOn()
-    def engageTouchscreenOff(self):
-        self.touchscreenOff()
-    def engageTouchpadOn(self):
-        self.touchpadOn()
-    def engageTouchpadOff(self):
-        self.touchpadOff()
-    def engageNippleOn(self):
-        self.nippleOn()
-    def engageNippleOff(self):
-        self.nippleOff()
-    def engageStylusProximityControlOn(self):
-        self.stylusProximityControlOn()
-    def engageStylusProximityControlOff(self):
-        self.stylusProximityControlOff()
-    def engageDisplayPositionControlOn(self):
-        self.displayPositionControlOn()
-    def engageDisplayPositionControlOff(self):
-        self.displayPositionControlOff()
+    def displayPositionControlSwitch(
+        self,
+        status = None
+        ):
+        if status == "on":
+            log.info("change display position control to on")
+            self.processDisplayPositionControl = multiprocessing.Process(
+                target = self.displayPositionControl
+            )
+            self.processDisplayPositionControl.start()
+        elif status == "off":
+            log.info("change display position control to off")
+            self.processDisplayPositionControl.terminate()
+        else:
+            log.error(
+                "unknown display position control status \"{orientation}\" "
+                "requested".format(
+                    status = status
+                )
+            )
+            sys.exit()
+    def engageMode(
+        self,
+        mode = None
+        ):
+        log.info("engage mode {mode}".format(
+            mode = mode
+        ))
+        if mode == "tablet":
+            self.displayOrientation(orientation     = "left")
+            self.touchscreenOrientation(orientation = "left")
+            self.touchpadSwitch(status              = "off")
+            self.nippleSwitch(status                = "off") 
+        elif mode == "laptop":
+            self.displayOrientation(orientation     = "normal")
+            self.touchscreenOrientation(orientation = "normal")
+            self.touchscreenSwitch(status           = "on")
+            self.touchpadSwitch(status              = "on")
+            self.nippleSwitch(status                = "on")
+        elif mode in ["left", "right", "inverted", "normal"]:
+            self.displayOrientation(orientation     = mode)
+            self.touchscreenOrientation(orientation = mode)
+        else:
+            log.error(
+                "unknown mode \"{mode}\" requested".format(
+                    mode = mode
+                )
+            )
+            sys.exit()
+
+def engageCommand(command = None):
+    if options["--debugpassive"] is True:
+        log.debug("command: {command}".format(
+            command = command
+        ))
+    else:
+        os.system(command)
 
 def main(options):
 
@@ -311,9 +540,8 @@ def main(options):
     interface1  = interface(options)
     sys.exit(application.exec_())
 
-if __name__ == '__main__':
-
-    options = docopt(__doc__)
+if __name__ == "__main__":
+    options = docopt.docopt(__doc__)
     if options["--version"]:
         print(version)
         exit()
