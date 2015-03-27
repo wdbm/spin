@@ -12,7 +12,7 @@
 # The program spin provides an interface for control of the usage modes of     #
 # laptop-tablet and similar computer interface devices.                        #
 #                                                                              #
-# copyright (C) 2013 2014 William Breaden Madden                               #
+# copyright (C) 2013 William Breaden Madden                                    #
 #                                                                              #
 # This software is released under the terms of the GNU General Public License  #
 # version 3 (GPLv3).                                                           #
@@ -43,7 +43,7 @@ Options:
 """
 
 name    = "spin"
-version = "2015-03-16T2207Z"
+version = "2015-03-27T0116Z"
 
 import imp
 import urllib
@@ -94,7 +94,9 @@ class interface(QtGui.QWidget):
         ):
         self.options = options
         super(interface, self).__init__()
-        log.info("run spin")
+        log.info("initiate {name}".format(name = name))
+        # Audit the inputs available.
+        self.deviceNames = getInputs()
         # engage stylus proximity control
         self.stylusProximityControlSwitch(status = "on")
         # engage display position control
@@ -266,7 +268,7 @@ class interface(QtGui.QWidget):
         elif options["--nogui"]:
             log.info("non-GUI mode")
     def closeEvent(self, event):
-        log.info("stopping spin")
+        log.info("terminate {name}".format(name = name))
         self.stylusProximityControlSwitch(status = "off")
         self.displayPositionControlSwitch(status = "off")
         self.deleteLater() 
@@ -295,103 +297,125 @@ class interface(QtGui.QWidget):
         self,
         orientation = None
         ):
-        coordinateTransformationMatrix = {
-            "left":     "0 -1 1 1 0 0 0 0 1",
-            "right":    "0 1 0 -1 0 1 0 0 1",
-            "inverted": "-1 0 1 0 -1 1 0 0 1",
-            "normal":   "1 0 0 0 1 0 0 0 1"
-        }
-        if coordinateTransformationMatrix.has_key(orientation):
-            log.info("change touchscreen to {orientation}".format(
-                orientation = orientation
-            ))
-            engageCommand(
-                "xinput set-prop \"ELAN Touchscreen\" \"Coordinate "
-                "Transformation Matrix\" "
-                "{matrix}".format(
-                    matrix = coordinateTransformationMatrix[orientation]
-                )
-            )
-        else:
-            log.error(
-                "unknown touchscreen orientation \"{orientation}\""
-                " requested".format(
+        if "touchscreen" in self.deviceNames:
+            coordinateTransformationMatrix = {
+                "left":     "0 -1 1 1 0 0 0 0 1",
+                "right":    "0 1 0 -1 0 1 0 0 1",
+                "inverted": "-1 0 1 0 -1 1 0 0 1",
+                "normal":   "1 0 0 0 1 0 0 0 1"
+            }
+            if coordinateTransformationMatrix.has_key(orientation):
+                log.info("change touchscreen to {orientation}".format(
                     orientation = orientation
+                ))
+                engageCommand(
+                    "xinput set-prop \"{deviceName}\" \"Coordinate "
+                    "Transformation Matrix\" "
+                    "{matrix}".format(
+                        deviceName = self.deviceNames["touchscreen"],
+                        matrix = coordinateTransformationMatrix[orientation]
+                    )
                 )
-            )
-            sys.exit()
+            else:
+                log.error(
+                    "unknown touchscreen orientation \"{orientation}\""
+                    " requested".format(
+                        orientation = orientation
+                    )
+                )
+                sys.exit()
+        else:
+            log.debug("touchscreen orientation unchanged")
     def touchscreenSwitch(
         self,
         status = None
         ):
-        xinputStatus = {
-            "on":  "enable",
-            "off": "disable"
-        }
-        if xinputStatus.has_key(status):
-            log.info("change touchscreen to {status}".format(
-                status = status
-            ))
-            engageCommand(
-                "xinput {status} \"ELAN Touchscreen\"".format(
-                    status = xinputStatus[status]
-                )
-            )
-        else:
-            log.error(
-                "unknown touchscreen status \"{orientation}\" requested".format(
+        if "touchscreen" in self.deviceNames:
+            xinputStatus = {
+                "on":  "enable",
+                "off": "disable"
+            }
+            if xinputStatus.has_key(status):
+                log.info("change touchscreen to {status}".format(
                     status = status
+                ))
+                engageCommand(
+                    "xinput {status} \"{deviceName}\"".format(
+                        status = xinputStatus[status],
+                        deviceName = self.deviceNames["touchscreen"]
+                    )
                 )
-            )
-            sys.exit()
+            else:
+                _message = "unknown touchscreen status \"{status}\" " +\
+                           "requested"
+                log.error(
+                    _message.format(
+                        status = status
+                    )
+                )
+                sys.exit()
+        else:
+            log.debug("touchscreen status unchanged")
     def touchpadSwitch(
         self,
         status = None
         ):
-        xinputStatus = {
-            "on":  "enable",
-            "off": "disable"
-        }
-        if xinputStatus.has_key(status):
-            log.info("change touchpad to {status}".format(
-                status = status
-            ))
-            engageCommand(
-                "xinput {status} \"SynPS/2 Synaptics TouchPad\"".format(
-                    status = xinputStatus[status]
-                )
-            )
-        else:
-            log.error(
-                "unknown touchpad status \"{orientation}\" requested".format(
+        if "touchpad" in self.deviceNames:
+            xinputStatus = {
+                "on":  "enable",
+                "off": "disable"
+            }
+            if xinputStatus.has_key(status):
+                log.info("change touchpad to {status}".format(
                     status = status
+                ))
+                engageCommand(
+                    "xinput {status} \"{deviceName}\"".format(
+                        status = xinputStatus[status],
+                        deviceName = self.deviceNames["touchscreen"]
+                    )
                 )
-            )
-            sys.exit()
+            else:
+                _message = "unknown touchpad status \"{status}\" " +\
+                           "requested"
+                log.error(
+                    _message.format(
+                        status = status
+                    )
+                )
+                sys.exit()
+        else:
+            log.debug("touchpad status unchanged")
     def nippleSwitch(
         self,
         status = None
         ):
-        xinputStatus = {
-            "on":  "enable",
-            "off": "disable"
-        }
-        if xinputStatus.has_key(status):
-            log.info("change nipple to {status}".format(
-                status = status
-            ))
-            engageCommand(
-                "xinput {status} \"TPPS/2 IBM TrackPoint\"".format(
-                    status = xinputStatus[status]
-                )
-            )
-        else:
-            log.error(
-                "unknown nipple status \"{orientation}\" requested".format(
+        if "nipple" in self.deviceNames:
+            xinputStatus = {
+                "on":  "enable",
+                "off": "disable"
+            }
+            if xinputStatus.has_key(status):
+                log.info("change nipple to {status}".format(
                     status = status
+                ))
+                engageCommand(
+                    "xinput {status} \"{deviceName}\"".format(
+                        status = xinputStatus[status],
+                        deviceName = self.deviceNames["touchscreen"]
+                    )
                 )
-            )
-            sys.exit()
+            else:
+                _message = "unknown nipple status \"{status}\" " +\
+                           "requested"
+                log.error(
+                    _message.format(
+                        status = status
+                    )
+                )
+                sys.exit()
+        else:
+            log.debug("nipple status unchanged")
     def stylusProximityControl(self):
         self.previousStylusProximityStatus = None
         while True:
@@ -520,9 +544,42 @@ class interface(QtGui.QWidget):
             )
             sys.exit()
 
+def getInputs():
+    log.info("audit inputs")
+    inputDevices = subprocess.Popen(
+        ["xinput", "--list"],
+        stdin = subprocess.PIPE,
+        stdout = subprocess.PIPE,
+        stderr = subprocess.PIPE
+    ).communicate()[0]
+    devicesAndKeyphrases = {
+        "touchscreen": ["SYNAPTICS Synaptics Touch Digitizer V04",
+                        "ELAN Touchscreen"],
+        "touchpad":    ["PS/2 Synaptics TouchPad",
+                        "SynPS/2 Synaptics TouchPad"],
+        "nipple":      ["TPPS/2 IBM TrackPoint"],
+        "stylus":      ["Wacom ISDv4 EC Pen stylus"]
+    }
+    deviceNames = {}
+    for device, keyphrases in devicesAndKeyphrases.iteritems():
+        for keyphrase in keyphrases:
+            if keyphrase in inputDevices:
+                deviceNames[device] = keyphrase
+    for device, keyphrases in devicesAndKeyphrases.iteritems():
+        if device in deviceNames:
+            log.info("input {device} detected as \"{deviceName}\"".format(
+                device     = device,
+                deviceName = deviceNames[device]
+            ))
+        else:
+            log.info("input {device} not detected".format(
+                device = device
+            ))
+    return(deviceNames)
+
 def engageCommand(command = None):
     if options["--debugpassive"] is True:
-        log.debug("command: {command}".format(
+        log.info("command: {command}".format(
             command = command
         ))
     else:
