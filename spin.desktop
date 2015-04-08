@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=spin
+Exec=python spin.svg
+Terminal=false
+Type=Application
+Icon=spin.svg
