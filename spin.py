@@ -43,7 +43,7 @@ Options:
 """
 
 name    = "spin"
-version = "2015-04-14T1435Z"
+version = "2015-04-14T1444Z"
 
 import imp
 import urllib
@@ -360,6 +360,39 @@ class interface(QtGui.QWidget):
                 sys.exit()
         else:
             log.debug("touchscreen status unchanged")
+    def touchpadOrientation(
+        self,
+        orientation = None
+        ):
+        if "touchpad" in self.deviceNames:
+            coordinateTransformationMatrix = {
+                "left":     "0 -1 1 1 0 0 0 0 1",
+                "right":    "0 1 0 -1 0 1 0 0 1",
+                "inverted": "-1 0 1 0 -1 1 0 0 1",
+                "normal":   "1 0 0 0 1 0 0 0 1"
+            }
+            if coordinateTransformationMatrix.has_key(orientation):
+                log.info("change touchpad to {orientation}".format(
+                    orientation = orientation
+                ))
+                engageCommand(
+                    "xinput set-prop \"{deviceName}\" \"Coordinate "
+                    "Transformation Matrix\" "
+                    "{matrix}".format(
+                        deviceName = self.deviceNames["touchpad"],
+                        matrix = coordinateTransformationMatrix[orientation]
+                    )
+                )
+            else:
+                log.error(
+                    "unknown touchpad orientation \"{orientation}\""
+                    " requested".format(
+                        orientation = orientation
+                    )
+                )
+                sys.exit()
+        else:
+            log.debug("touchpad orientation unchanged")
     def touchpadSwitch(
         self,
         status = None
@@ -535,11 +568,13 @@ class interface(QtGui.QWidget):
             self.displayOrientation(orientation     = "normal")
             self.touchscreenOrientation(orientation = "normal")
             self.touchscreenSwitch(status           = "on")
+            self.touchpadOrientation(orientation    = "normal")
             self.touchpadSwitch(status              = "on")
             self.nippleSwitch(status                = "on")
         elif mode in ["left", "right", "inverted", "normal"]:
             self.displayOrientation(orientation     = mode)
             self.touchscreenOrientation(orientation = mode)
+            self.touchpadOrientation(orientation    = mode)
         else:
             log.error(
                 "unknown mode \"{mode}\" requested".format(
