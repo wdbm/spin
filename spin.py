@@ -43,7 +43,7 @@ Options:
 """
 
 name    = "spin"
-version = "2015-03-27T0116Z"
+version = "2015-04-14T1435Z"
 
 import imp
 import urllib
@@ -97,6 +97,10 @@ class interface(QtGui.QWidget):
         log.info("initiate {name}".format(name = name))
         # Audit the inputs available.
         self.deviceNames = getInputs()
+        if options["--debugpassive"] is True:
+            log.info("device names: {deviceNames}".format(
+                deviceNames = self.deviceNames
+            ))
         # engage stylus proximity control
         self.stylusProximityControlSwitch(status = "on")
         # engage display position control
@@ -372,7 +376,7 @@ class interface(QtGui.QWidget):
                 engageCommand(
                     "xinput {status} \"{deviceName}\"".format(
                         status = xinputStatus[status],
-                        deviceName = self.deviceNames["touchscreen"]
+                        deviceName = self.deviceNames["touchpad"]
                     )
                 )
             else:
