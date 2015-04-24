@@ -439,7 +439,7 @@ class interface(QtGui.QWidget):
                 engageCommand(
                     "xinput {status} \"{deviceName}\"".format(
                         status = xinputStatus[status],
-                        deviceName = self.deviceNames["touchscreen"]
+                        deviceName = self.deviceNames["nipple"]
                     )
                 )
             else:
