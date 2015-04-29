@@ -43,7 +43,7 @@ Options:
 """
 
 name    = "spin"
-version = "2015-04-14T1444Z"
+version = "2015-04-29T1539Z"
 
 import imp
 import urllib
@@ -96,16 +96,16 @@ class interface(QtGui.QWidget):
         super(interface, self).__init__()
         log.info("initiate {name}".format(name = name))
         # Audit the inputs available.
-        self.deviceNames = getInputs()
+        self.deviceNames = get_inputs()
         if options["--debugpassive"] is True:
             log.info("device names: {deviceNames}".format(
                 deviceNames = self.deviceNames
             ))
         # engage stylus proximity control
-        self.stylusProximityControlSwitch(status = "on")
+        self.stylus_proximity_control_switch(status = "on")
         # engage display position control
         self.displayPositionStatus = "laptop"
-        self.displayPositionControlSwitch(status = "on")
+        self.display_position_control_switch(status = "on")
         if not options["--nogui"]:
             # create buttons
             buttonsList = []
@@ -115,7 +115,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonModeTablet.clicked.connect(
-                lambda: self.engageMode(mode = "tablet")
+                lambda: self.engage_mode(mode = "tablet")
             )
             buttonsList.append(buttonModeTablet)
             # button: laptop mode
@@ -124,7 +124,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonModeLaptop.clicked.connect(
-                lambda: self.engageMode(mode = "laptop")
+                lambda: self.engage_mode(mode = "laptop")
             )
             buttonsList.append(buttonModeLaptop)
             # button: left
@@ -133,7 +133,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonLeft.clicked.connect(
-                lambda: self.engageMode(mode = "left")
+                lambda: self.engage_mode(mode = "left")
             )
             buttonsList.append(buttonLeft)
             # button: right
@@ -141,7 +141,7 @@ class interface(QtGui.QWidget):
                 "right", self
             )
             buttonRight.clicked.connect(
-                lambda: self.engageMode(mode = "right")
+                lambda: self.engage_mode(mode = "right")
             )
             buttonsList.append(buttonRight)
             # button: inverted
@@ -150,7 +150,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonInverted.clicked.connect(
-                lambda: self.engageMode(mode = "inverted")
+                lambda: self.engage_mode(mode = "inverted")
             )
             buttonsList.append(buttonInverted)
             # button: normal
@@ -159,7 +159,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonNormal.clicked.connect(
-                lambda: self.engageMode(mode = "normal")
+                lambda: self.engage_mode(mode = "normal")
             )
             buttonsList.append(buttonNormal)
             # button: touchscreen on
@@ -168,7 +168,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonTouchscreenOn.clicked.connect(
-                lambda: self.touchscreenSwitch(status = "on")
+                lambda: self.touchscreen_switch(status = "on")
             )
             buttonsList.append(buttonTouchscreenOn)
             # button: touchscreen off
@@ -177,7 +177,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonTouchscreenOff.clicked.connect(
-                lambda: self.touchscreenSwitch(status = "off")
+                lambda: self.touchscreen_switch(status = "off")
             )
             buttonsList.append(buttonTouchscreenOff)
             # button: touchpad on
@@ -186,7 +186,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonTouchpadOn.clicked.connect(
-                lambda: self.touchpadSwitch(status = "on")
+                lambda: self.touchpad_switch(status = "on")
             )
             buttonsList.append(buttonTouchpadOn)
             # button: touchpad off
@@ -195,7 +195,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonTouchpadOff.clicked.connect(
-                lambda: self.touchpadSwitch(status = "off")
+                lambda: self.touchpad_switch(status = "off")
             )
             buttonsList.append(buttonTouchpadOff)
             # button: nipple on
@@ -204,7 +204,7 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonNippleOn.clicked.connect(
-                lambda: self.nippleSwitch(status = "on")
+                lambda: self.nipple_switch(status = "on")
             )
             buttonsList.append(buttonNippleOn)
             # button: nipple off
@@ -213,45 +213,45 @@ class interface(QtGui.QWidget):
                 self
             )
             buttonNippleOff.clicked.connect(
-                lambda: self.nippleSwitch(status = "off")
+                lambda: self.nipple_switch(status = "off")
             )
             buttonsList.append(buttonNippleOff)
             # button: stylus proximity monitoring on
-            buttonStylusProximityControlOn = QtGui.QPushButton(
+            buttonstylus_proximity_controlOn = QtGui.QPushButton(
                 "stylus proximity monitoring on",
                 self
             )
-            buttonStylusProximityControlOn.clicked.connect(
-                lambda: self.stylusProximityControlSwitch(status = "on")
+            buttonstylus_proximity_controlOn.clicked.connect(
+                lambda: self.stylus_proximity_control_switch(status = "on")
             )
-            buttonsList.append(buttonStylusProximityControlOn)
+            buttonsList.append(buttonstylus_proximity_controlOn)
             # button: stylus proximity monitoring off
-            buttonStylusProximityControlOff = QtGui.QPushButton(
+            buttonstylus_proximity_controlOff = QtGui.QPushButton(
                 "stylus proximity monitoring off",
                 self
             )
-            buttonStylusProximityControlOff.clicked.connect(
-                lambda: self.stylusProximityControlSwitch(status = "off")
+            buttonstylus_proximity_controlOff.clicked.connect(
+                lambda: self.stylus_proximity_control_switch(status = "off")
             )
-            buttonsList.append(buttonStylusProximityControlOff)
+            buttonsList.append(buttonstylus_proximity_controlOff)
             # button: display position monitoring on
-            buttonDisplayPositionControlOn = QtGui.QPushButton(
+            buttondisplay_position_controlOn = QtGui.QPushButton(
                 "display position monitoring on",
                 self
             )
-            buttonDisplayPositionControlOn.clicked.connect(
-                lambda: self.displayPositionControlSwitch(status = "on")
+            buttondisplay_position_controlOn.clicked.connect(
+                lambda: self.display_position_control_switch(status = "on")
             )
-            buttonsList.append(buttonDisplayPositionControlOn)
+            buttonsList.append(buttondisplay_position_controlOn)
             # button: display position monitoring off
-            buttonDisplayPositionControlOff = QtGui.QPushButton(
+            buttondisplay_position_controlOff = QtGui.QPushButton(
                 "display position monitoring off",
                 self
             )
-            buttonDisplayPositionControlOff.clicked.connect(
-                lambda: self.displayPositionControlSwitch(status = "off")
+            buttondisplay_position_controlOff.clicked.connect(
+                lambda: self.display_position_control_switch(status = "off")
             )
-            buttonsList.append(buttonDisplayPositionControlOff)
+            buttonsList.append(buttondisplay_position_controlOff)
             # set button dimensions
             buttonsWidth  = 250
             buttonsHeight = 50
@@ -271,12 +271,14 @@ class interface(QtGui.QWidget):
             self.show()
         elif options["--nogui"]:
             log.info("non-GUI mode")
-    def closeEvent(self, event):
+
+    def close_event(self, event):
         log.info("terminate {name}".format(name = name))
-        self.stylusProximityControlSwitch(status = "off")
-        self.displayPositionControlSwitch(status = "off")
+        self.stylus_proximity_control_switch(status = "off")
+        self.display_position_control_switch(status = "off")
         self.deleteLater() 
-    def displayOrientation(
+
+    def display_orientation(
         self,
         orientation = None
         ):
@@ -284,7 +286,7 @@ class interface(QtGui.QWidget):
             log.info("change display to {orientation}".format(
                 orientation = orientation
             ))
-            engageCommand(
+            engage_command(
                 "xrandr -o {orientation}".format(
                     orientation = orientation
                 )
@@ -297,7 +299,8 @@ class interface(QtGui.QWidget):
                 )
             )
             sys.exit()
-    def touchscreenOrientation(
+
+    def touchscreen_orientation(
         self,
         orientation = None
         ):
@@ -312,7 +315,7 @@ class interface(QtGui.QWidget):
                 log.info("change touchscreen to {orientation}".format(
                     orientation = orientation
                 ))
-                engageCommand(
+                engage_command(
                     "xinput set-prop \"{deviceName}\" \"Coordinate "
                     "Transformation Matrix\" "
                     "{matrix}".format(
@@ -330,7 +333,8 @@ class interface(QtGui.QWidget):
                 sys.exit()
         else:
             log.debug("touchscreen orientation unchanged")
-    def touchscreenSwitch(
+
+    def touchscreen_switch(
         self,
         status = None
         ):
@@ -343,7 +347,7 @@ class interface(QtGui.QWidget):
                 log.info("change touchscreen to {status}".format(
                     status = status
                 ))
-                engageCommand(
+                engage_command(
                     "xinput {status} \"{deviceName}\"".format(
                         status = xinputStatus[status],
                         deviceName = self.deviceNames["touchscreen"]
@@ -360,7 +364,8 @@ class interface(QtGui.QWidget):
                 sys.exit()
         else:
             log.debug("touchscreen status unchanged")
-    def touchpadOrientation(
+
+    def touchpad_orientation(
         self,
         orientation = None
         ):
@@ -375,7 +380,7 @@ class interface(QtGui.QWidget):
                 log.info("change touchpad to {orientation}".format(
                     orientation = orientation
                 ))
-                engageCommand(
+                engage_command(
                     "xinput set-prop \"{deviceName}\" \"Coordinate "
                     "Transformation Matrix\" "
                     "{matrix}".format(
@@ -393,7 +398,8 @@ class interface(QtGui.QWidget):
                 sys.exit()
         else:
             log.debug("touchpad orientation unchanged")
-    def touchpadSwitch(
+
+    def touchpad_switch(
         self,
         status = None
         ):
@@ -406,7 +412,7 @@ class interface(QtGui.QWidget):
                 log.info("change touchpad to {status}".format(
                     status = status
                 ))
-                engageCommand(
+                engage_command(
                     "xinput {status} \"{deviceName}\"".format(
                         status = xinputStatus[status],
                         deviceName = self.deviceNames["touchpad"]
@@ -423,7 +429,8 @@ class interface(QtGui.QWidget):
                 sys.exit()
         else:
             log.debug("touchpad status unchanged")
-    def nippleSwitch(
+
+    def nipple_switch(
         self,
         status = None
         ):
@@ -436,7 +443,7 @@ class interface(QtGui.QWidget):
                 log.info("change nipple to {status}".format(
                     status = status
                 ))
-                engageCommand(
+                engage_command(
                     "xinput {status} \"{deviceName}\"".format(
                         status = xinputStatus[status],
                         deviceName = self.deviceNames["nipple"]
@@ -453,7 +460,8 @@ class interface(QtGui.QWidget):
                 sys.exit()
         else:
             log.debug("nipple status unchanged")
-    def stylusProximityControl(self):
+
+    def stylus_proximity_control(self):
         self.previousStylusProximityStatus = None
         while True:
             stylusProximityCommand = "xinput query-state " + \
@@ -468,22 +476,23 @@ class interface(QtGui.QWidget):
                 (self.stylusProximityStatus == "out") and \
                 (self.previousStylusProximityStatus != "out"):
                 log.info("stylus inactive")
-                self.touchscreenSwitch(status = "on")
+                self.touchscreen_switch(status = "on")
             elif \
                 (self.stylusProximityStatus == "in") and \
                 (self.previousStylusProximityStatus != "in"):
                 log.info("stylus active")
-                self.touchscreenSwitch(status = "off")
+                self.touchscreen_switch(status = "off")
             self.previousStylusProximityStatus = self.stylusProximityStatus
             time.sleep(0.25)
-    def stylusProximityControlSwitch(
+
+    def stylus_proximity_control_switch(
         self,
         status = None
         ):
         if status == "on":
             log.info("change stylus proximity control to on")
             self.processStylusProximityControl = multiprocessing.Process(
-                target = self.stylusProximityControl
+                target = self.stylus_proximity_control
             )
             self.processStylusProximityControl.start()
         elif status == "off":
@@ -497,7 +506,8 @@ class interface(QtGui.QWidget):
                 )
             )
             sys.exit()
-    def displayPositionControl(self):
+
+    def display_position_control(self):
         socketACPI = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         socketACPI.connect("/var/run/acpid.socket")
         log.info("display position is {displayPositionStatus}".format(
@@ -515,7 +525,7 @@ class interface(QtGui.QWidget):
             if eventACPI == eventACPIDisplayPositionChange:
                 log.info("display position change")
                 if self.displayPositionStatus == "laptop":
-                    self.engageMode(mode = "tablet")
+                    self.engage_mode(mode = "tablet")
                     self.displayPositionStatus = "tablet"
                     log.info(
                         "display position is {displayPositionStatus}".format(
@@ -523,7 +533,7 @@ class interface(QtGui.QWidget):
                         )
                     )
                 elif self.displayPositionStatus == "tablet":
-                    self.engageMode(mode = "laptop")
+                    self.engage_mode(mode = "laptop")
                     self.displayPositionStatus = "laptop"
                     log.info(
                         "display position is {displayPositionStatus}".format(
@@ -531,19 +541,20 @@ class interface(QtGui.QWidget):
                         )
                     )
             time.sleep(0.25)
-    def displayPositionControlSwitch(
+
+    def display_position_control_switch(
         self,
         status = None
         ):
         if status == "on":
             log.info("change display position control to on")
-            self.processDisplayPositionControl = multiprocessing.Process(
-                target = self.displayPositionControl
+            self.processdisplay_position_control = multiprocessing.Process(
+                target = self.display_position_control
             )
-            self.processDisplayPositionControl.start()
+            self.processdisplay_position_control.start()
         elif status == "off":
             log.info("change display position control to off")
-            self.processDisplayPositionControl.terminate()
+            self.processdisplay_position_control.terminate()
         else:
             log.error(
                 "unknown display position control status \"{orientation}\" "
@@ -552,7 +563,8 @@ class interface(QtGui.QWidget):
                 )
             )
             sys.exit()
-    def engageMode(
+
+    def engage_mode(
         self,
         mode = None
         ):
@@ -560,21 +572,21 @@ class interface(QtGui.QWidget):
             mode = mode
         ))
         if mode == "tablet":
-            self.displayOrientation(orientation     = "left")
-            self.touchscreenOrientation(orientation = "left")
-            self.touchpadSwitch(status              = "off")
-            self.nippleSwitch(status                = "off") 
+            self.display_orientation(orientation     = "left")
+            self.touchscreen_orientation(orientation = "left")
+            self.touchpad_switch(status              = "off")
+            self.nipple_switch(status                = "off") 
         elif mode == "laptop":
-            self.displayOrientation(orientation     = "normal")
-            self.touchscreenOrientation(orientation = "normal")
-            self.touchscreenSwitch(status           = "on")
-            self.touchpadOrientation(orientation    = "normal")
-            self.touchpadSwitch(status              = "on")
-            self.nippleSwitch(status                = "on")
+            self.display_orientation(orientation     = "normal")
+            self.touchscreen_orientation(orientation = "normal")
+            self.touchscreen_switch(status           = "on")
+            self.touchpad_orientation(orientation    = "normal")
+            self.touchpad_switch(status              = "on")
+            self.nipple_switch(status                = "on")
         elif mode in ["left", "right", "inverted", "normal"]:
-            self.displayOrientation(orientation     = mode)
-            self.touchscreenOrientation(orientation = mode)
-            self.touchpadOrientation(orientation    = mode)
+            self.display_orientation(orientation     = mode)
+            self.touchscreen_orientation(orientation = mode)
+            self.touchpad_orientation(orientation    = mode)
         else:
             log.error(
                 "unknown mode \"{mode}\" requested".format(
@@ -583,7 +595,7 @@ class interface(QtGui.QWidget):
             )
             sys.exit()
 
-def getInputs():
+def get_inputs():
     log.info("audit inputs")
     inputDevices = subprocess.Popen(
         ["xinput", "--list"],
@@ -616,13 +628,64 @@ def getInputs():
             ))
     return(deviceNames)
 
-def engageCommand(command = None):
+def engage_command(
+    command = None
+    ):
     if options["--debugpassive"] is True:
         log.info("command: {command}".format(
             command = command
         ))
     else:
         os.system(command)
+
+def mean_list(
+    lists = None
+    ):
+    return([sum(element)/len(element) for element in zip(*lists)])
+
+class AccelerationVector(list):
+
+    def __init__(self):
+        list.__init__(self)  
+        # Access the IIO interface to the accelerometer.
+        devicesDirectories = glob.glob("/sys/bus/iio/devices/iio:device*")
+        for directory in devicesDirectories:
+            if "accel_3d" in open(os.path.join(directory, "name")).read():
+                self.accelerometerDirectory = directory
+        self.accelerometerScaleFileFullPath =\
+            self.accelerometerDirectory + "/" + "in_accel_scale"
+        self.accelerometerAxisxFileFullPath =\
+            self.accelerometerDirectory + "/" + "in_accel_x_raw"
+        self.accelerometerAxisyFileFullPath =\
+            self.accelerometerDirectory + "/" + "in_accel_y_raw"
+        self.accelerometerAxiszFileFullPath =\
+            self.accelerometerDirectory + "/" + "in_accel_z_raw"
+        self.accelerometerScaleFile = open(self.accelerometerScaleFileFullPath)
+        self.accelerometerAxisxFile = open(self.accelerometerAxisxFileFullPath)
+        self.accelerometerAxisyFile = open(self.accelerometerAxisyFileFullPath)
+        self.accelerometerAxiszFile = open(self.accelerometerAxiszFileFullPath)
+        # Access the scale.
+        self.scale = float(self.accelerometerScaleFile.read())
+        # Initialise the vector.
+        self.extend([0, 0, 0])
+        self.update()
+
+    def update(self):
+        # Access the acceleration.
+        self.accelerometerAxisxFile.seek(0)
+        self.accelerometerAxisyFile.seek(0)
+        self.accelerometerAxiszFile.seek(0)
+        acceleration_x = float(self.accelerometerAxisxFile.read()) * self.scale
+        acceleration_y = float(self.accelerometerAxisyFile.read()) * self.scale
+        acceleration_z = float(self.accelerometerAxiszFile.read()) * self.scale
+        # Update the vector.
+        self[0] = acceleration_x
+        self[1] = acceleration_y
+        self[2] = acceleration_z
+
+    def __repr__(self):
+        self.update()
+        return(list.__repr__(self))
 
 def main(options):
 
