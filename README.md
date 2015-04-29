@@ -38,3 +38,11 @@ This utility has been tested on the following computer models:
 - ThinkPad S120 Yoga
 
 There is evidence that it does not run with full functionality on the ThinkPad Yoga 14.
+
+## acceleration control
+
+There is an experimental acceleration control included which is deactivated by default. It can be activated by selecting the appropriate button in the graphical mode. Use it with caution because it can result in distortion of the display, including display blackout.
+
+## future
+
+Under consideration is state recording in order to avoid execution of unnecessary commands, better handling of subprocesses, clearer logging and a more ergonomic graphical mode.

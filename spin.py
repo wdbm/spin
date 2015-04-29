@@ -43,7 +43,7 @@ Options:
 """
 
 name    = "spin"
-version = "2015-04-29T1539Z"
+version = "2015-04-29T1702Z"
 
 import imp
 import urllib
@@ -75,6 +75,7 @@ def smuggle(
 
 import os
 import sys
+import glob
 import subprocess
 import multiprocessing
 import socket
@@ -103,6 +104,8 @@ class interface(QtGui.QWidget):
             ))
         # engage stylus proximity control
         self.stylus_proximity_control_switch(status = "on")
+        # engage acceleration control
+        #self.acceleration_control_switch(status = "on")
         # engage display position control
         self.displayPositionStatus = "laptop"
         self.display_position_control_switch(status = "on")
@@ -217,23 +220,41 @@ class interface(QtGui.QWidget):
             )
             buttonsList.append(buttonNippleOff)
             # button: stylus proximity monitoring on
-            buttonstylus_proximity_controlOn = QtGui.QPushButton(
+            buttonStylusProximityControlOn = QtGui.QPushButton(
                 "stylus proximity monitoring on",
                 self
             )
-            buttonstylus_proximity_controlOn.clicked.connect(
+            buttonStylusProximityControlOn.clicked.connect(
                 lambda: self.stylus_proximity_control_switch(status = "on")
             )
-            buttonsList.append(buttonstylus_proximity_controlOn)
+            buttonsList.append(buttonStylusProximityControlOn)
             # button: stylus proximity monitoring off
-            buttonstylus_proximity_controlOff = QtGui.QPushButton(
+            buttonStylusProximityControlOff = QtGui.QPushButton(
                 "stylus proximity monitoring off",
                 self
             )
-            buttonstylus_proximity_controlOff.clicked.connect(
+            buttonStylusProximityControlOff.clicked.connect(
                 lambda: self.stylus_proximity_control_switch(status = "off")
             )
-            buttonsList.append(buttonstylus_proximity_controlOff)
+            buttonsList.append(buttonStylusProximityControlOff)
+            # button: acceleration monitoring on
+            buttonAccelerationControlOn = QtGui.QPushButton(
+                "acceleration monitoring on",
+                self
+            )
+            buttonAccelerationControlOn.clicked.connect(
+                lambda: self.acceleration_control_switch(status = "on")
+            )
+            buttonsList.append(buttonAccelerationControlOn)
+            # button: acceleration monitoring off
+            buttonAccelerationControlOff = QtGui.QPushButton(
+                "acceleration monitoring off",
+                self
+            )
+            buttonAccelerationControlOff.clicked.connect(
+                lambda: self.acceleration_control_switch(status = "off")
+            )
+            buttonsList.append(buttonAccelerationControlOff)
             # button: display position monitoring on
             buttondisplay_position_controlOn = QtGui.QPushButton(
                 "display position monitoring on",
@@ -253,10 +274,21 @@ class interface(QtGui.QWidget):
             )
             buttonsList.append(buttondisplay_position_controlOff)
             # set button dimensions
-            buttonsWidth  = 250
-            buttonsHeight = 50
+            buttonsWidth  = 240
+            buttonsHeight = 30
             for button in buttonsList:
                 button.setFixedSize(buttonsWidth, buttonsHeight)
+                button.setStyleSheet(
+                    """
+                    color: #000000;
+                    background-color: #ffffff;
+                    border: 1px solid #000000;
+                    font-size: 10pt;
+                    text-align: left;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    """
+                )
             # set layout
             vbox = QtGui.QVBoxLayout()
             vbox.addStretch(1)
@@ -461,7 +493,9 @@ class interface(QtGui.QWidget):
         else:
             log.debug("nipple status unchanged")
 
-    def stylus_proximity_control(self):
+    def stylus_proximity_control(
+        self
+        ):
         self.previousStylusProximityStatus = None
         while True:
             stylusProximityCommand = "xinput query-state " + \
@@ -483,7 +517,7 @@ class interface(QtGui.QWidget):
                 log.info("stylus active")
                 self.touchscreen_switch(status = "off")
             self.previousStylusProximityStatus = self.stylusProximityStatus
-            time.sleep(0.25)
+            time.sleep(0.15)
 
     def stylus_proximity_control_switch(
         self,
@@ -500,7 +534,53 @@ class interface(QtGui.QWidget):
             self.processStylusProximityControl.terminate()
         else:
             log.error(
-                "unknown stylus proximity control status \"{orientation}\" "
+                "unknown stylus proximity control status \"{status}\" "
+                "requested".format(
+                    status = status
+                )
+            )
+            sys.exit()
+
+    def acceleration_control(self):
+        while True:
+            # Get the mean of recent acceleration vectors.
+            numberOfMeasurements = 3
+            measurements = []
+            for measurement in range(0, numberOfMeasurements):
+                measurements.append(AccelerationVector())
+            stableAcceleration = mean_list(lists = measurements)
+            log.info("stable acceleration vector: {vector}".format(
+                vector = stableAcceleration
+            ))
+            tableOrientations = {
+                (True,  True):  "right",
+                (True,  False): "left",
+                (False, True):  "inverted",
+                (False, False): "normal"
+            }
+            orientation = tableOrientations[(
+                abs(stableAcceleration[0]) > abs(stableAcceleration[1]),
+                stableAcceleration[0] > 0
+            )]
+            self.engage_mode(mode = orientation)
+            time.sleep(0.15)
+
+    def acceleration_control_switch(
+        self,
+        status = None
+        ):
+        if status == "on":
+            log.info("change acceleration control to on")
+            self.processAccelerationControl = multiprocessing.Process(
+                target = self.acceleration_control
+            )
+            self.processAccelerationControl.start()
+        elif status == "off":
+            log.info("change acceleration control to off")
+            self.processAccelerationControl.terminate()
+        else:
+            log.error(
+                "unknown acceleration control status \"{status}\" "
                 "requested".format(
                     status = status
                 )
@@ -540,7 +620,7 @@ class interface(QtGui.QWidget):
                             displayPositionStatus = self.displayPositionStatus
                         )
                     )
-            time.sleep(0.25)
+            time.sleep(0.15)
 
     def display_position_control_switch(
         self,
