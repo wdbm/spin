@@ -43,7 +43,7 @@ Options:
 """
 
 name    = "spin"
-version = "2015-04-29T1702Z"
+version = "2015-04-29T1808Z"
 
 import imp
 import urllib
@@ -553,8 +553,8 @@ class interface(QtGui.QWidget):
                 vector = stableAcceleration
             ))
             tableOrientations = {
-                (True,  True):  "right",
-                (True,  False): "left",
+                (True,  True):  "left",
+                (True,  False): "right",
                 (False, True):  "inverted",
                 (False, False): "normal"
             }
