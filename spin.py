@@ -43,7 +43,7 @@ Options:
 """
 
 name    = "spin"
-version = "2015-04-29T1808Z"
+version = "2015-04-30T0256Z"
 
 import imp
 import urllib
@@ -770,10 +770,12 @@ class AccelerationVector(list):
 def main(options):
 
     # logging
-    logging.basicConfig()
     global log
-    log       = logging.getLogger(__name__)
-    log.level = logging.INFO
+    log        = logging.getLogger()
+    logHandler = logging.StreamHandler()
+    log.addHandler(logHandler)
+    logHandler.setFormatter(logging.Formatter("%(message)s"))
+    log.level  = logging.INFO
 
     application = QtGui.QApplication(sys.argv)
     interface1  = interface(options)
