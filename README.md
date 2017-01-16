@@ -2,11 +2,11 @@
 
 a small utility to assist in setting usage modes of laptop-tablet devices
 
-## prerequisites
+## setup
 
 ```Bash
-sudo apt-get -y install python-docopt
 sudo apt-get -y install python-qt4
+sudo pip install python_spin
 ```
 
 ## quick start
@@ -17,7 +17,7 @@ This utility can be run in its default graphical mode or in a non-graphical mode
 spin.py
 ```
 
-while the non-graphical mode is engaged by using the option ```--nogui```:
+while the non-graphical mode is engaged by using the option `--nogui`:
 
 ```Bash
 spin.py --nogui
@@ -31,6 +31,7 @@ This utility has been tested on the following operating systems:
 
 - Ubuntu 14.10
 - Ubuntu 15.04
+- Ubuntu 16.10
 
 This utility has been tested on the following computer models:
 
@@ -41,7 +42,7 @@ There is evidence that it does not run with full functionality on the ThinkPad Y
 
 ## acceleration control
 
-There is an experimental acceleration control included which is deactivated by default. It can be activated by selecting the appropriate button in the graphical mode. Use it with caution because it can result in distortion of the display, including display blackout.
+There is an experimental acceleration control included which is deactivated by default. It can be activated by selecting the appropriate button in the graphical mode.
 
 ## future
 
