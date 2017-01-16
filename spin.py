@@ -46,7 +46,7 @@ Options:
 """
 
 name    = "spin"
-version = "2017-01-16T1950Z"
+version = "2017-01-16T2020Z"
 logo    = None
 
 import docopt
@@ -677,7 +677,7 @@ def get_inputs():
     log.info("audit inputs")
     devices_input = subprocess.Popen(
         ["xinput", "--list"],
-        stdin = subprocess.PIPE,
+        stdin  = subprocess.PIPE,
         stdout = subprocess.PIPE,
         stderr = subprocess.PIPE
     ).communicate()[0]
