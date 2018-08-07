@@ -39,11 +39,12 @@ options:
     -h,--help        display help message
     --version        display version and exit
     --no_GUI         non-GUI mode
+    --debug_active   display commands while executing
     --debug_passive  display commands without executing
 """
 
 name        = "spin"
-__version__ = "2018-08-07T2130Z"
+__version__ = "2018-08-07T2230Z"
 
 import docopt
 import glob
@@ -93,7 +94,7 @@ class Interface(QWidget):
         log.info("initiate {name}".format(name = name))
         # Audit the inputs available.
         self.names_devices = get_inputs()
-        if options["--debug_passive"] is True:
+        if options["--debug_active"] is True or options["--debug_passive"] is True:
             log.info("device names: {names_devices}".format(names_devices = self.names_devices))
         # engage stylus proximity control
         self.stylus_proximity_control_switch(status = "on")
@@ -493,6 +494,9 @@ def get_inputs():
 def engage_command(command = None):
     if options["--debug_passive"] is True:
         log.info("command: {command}".format(command = command))
+    elif options["--debug_active"] is True:
+        log.info("command: {command}".format(command = command))
+        os.system(command)
     else:
         os.system(command)
 
