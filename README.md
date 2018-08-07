@@ -39,20 +39,18 @@ while the non-graphical mode is engaged by using the option `--no_GUI`:
 spin --no_GUI
 ```
 
+There are other options which are described by `spin --help`.
+
 By default, this utility disables the touchscreen on detecting the stylus in proximity and it changes between the laptop and tablet modes on detecting toggling between the laptop and tablet usage configurations. These default behaviours are provided by both the graphical and non-graphical modes of this utility. This utility should be initiated in the laptop usage configuration.
 
 # compatibility
 
-This utility has been tested on the following operating systems:
-
-- Ubuntu 16.04 (X11, Unity)
-
-This utility has been tested on the following computer models:
-
-- ThinkPad S1 Yoga
-- ThinkPad S120 Yoga
-
-It may run on the ThinkPad Yoga P40 and there is evidence that it does not run with full functionality on the ThinkPad Yoga 14.
+|**computer model**|**operating system and setup**|**comment**                                     |
+|------------------|------------------------------|------------------------------------------------|
+|ThinkPad S1 Yoga  |Ubuntu 16.04 (X11, Unity)     |working                                         |
+|ThinkPad S120 Yoga|Ubuntu 16.04 (X11, Unity)     |working                                         |
+|ThinkPad Yoga 14  |Ubuntu 16.04 (X11, Unity)     |possibly working with some reduced functionality|
+|ThinkPad Yoga P40 |Ubuntu 16.04 (X11, Unity)     |possibly working                                |
 
 # acceleration control
 
