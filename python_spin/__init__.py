@@ -44,7 +44,7 @@ options:
 """
 
 name        = "spin"
-__version__ = "2018-08-07T2230Z"
+__version__ = "2018-08-07T2245Z"
 
 import docopt
 import glob
@@ -62,11 +62,7 @@ if sys.version_info[0] <= 2:
 
 from PyQt5.QtWidgets import (
     QApplication,
-    QInputDialog,
-    QLabel,
-    QLineEdit,
     QPushButton,
-    QTextEdit,
     QVBoxLayout,
     QWidget
 )

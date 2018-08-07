@@ -7,7 +7,7 @@ import setuptools
 def main():
     setuptools.setup(
         name                 = "python_spin",
-        version              = "2018.08.07.2230",
+        version              = "2018.08.07.2245",
         description          = "a small utility to assist in setting usage modes of laptop-tablet devices",
         long_description     = long_description(),
         url                  = "https://github.com/wdbm/spin",
