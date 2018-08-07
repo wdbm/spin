@@ -20,9 +20,9 @@ sudo pip install python_spin
 To set up globally a Linux desktop launcher with icon, execute the following:
 
 ```Bash
-sudo wget --content-disposition -N -P /usr/share/icons/spin.svg https://raw.githubusercontent.com/wdbm/spin/master/python_spin/static/spin.svg
+sudo wget --content-disposition -N -P /usr/share/icons/ https://raw.githubusercontent.com/wdbm/spin/master/python_spin/static/spin.svg
 
-sudo wget --content-disposition -N -P /usr/share/applications/spin.desktop https://raw.githubusercontent.com/wdbm/spin/master/python_spin/static/spin.desktop
+sudo wget --content-disposition -N -P /usr/share/applications/ https://raw.githubusercontent.com/wdbm/spin/master/python_spin/static/spin.desktop
 ```
 
 # quick start
