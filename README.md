@@ -12,8 +12,21 @@ a small utility to assist in setting usage modes of laptop-tablet devices
 
 This utility requires X11.
 
+Install PyQt5. On Ubuntu 16.04 LTS, run the following:
+
 ```Bash
 sudo apt install python-qt5
+```
+
+On Ubuntu 18.04 LTS, run the following:
+
+```Bash
+sudo apt install pyqt5-dev pyqt5-dev-tools
+```
+
+Now install spin by running the following:
+
+```Bash
 sudo pip install python_spin
 ```
 
