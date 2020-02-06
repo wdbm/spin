@@ -44,7 +44,7 @@ options:
 """
 
 name        = 'spin'
-__version__ = '2020-02-06T0230Z'
+__version__ = '2020-02-06T0328Z'
 
 import docopt
 import glob
@@ -258,6 +258,30 @@ class Interface(QWidget):
         else:
             log.debug('touchscreen status unchanged')
 
+    def stylus_orientation(self, orientation=None):
+        if 'stylus' in self.names_devices:
+            coordinate_transformation_matrix = {
+                'left'    : '0 -1 1 1 0 0 0 0 1',
+                'right'   : '0 1 0 -1 0 1 0 0 1',
+                'inverted': '-1 0 1 0 -1 1 0 0 1',
+                'normal'  : '1 0 0 0 1 0 0 0 1'
+            }
+            if orientation in coordinate_transformation_matrix:
+                log.info('change stylus to {orientation}'.format(orientation=orientation))
+                engage_command(
+                    'xinput set-prop "{name_device}" "Coordinate '
+                    'Transformation Matrix" '
+                    '{matrix}'.format(
+                        name_device = self.names_devices['stylus'],
+                        matrix      = coordinate_transformation_matrix[orientation]
+                    )
+                )
+            else:
+                log.error('unknown stylus orientation "{orientation}" requested'.format(orientation=orientation))
+                sys.exit()
+        else:
+            log.debug('stylus orientation unchanged')
+
     def touchpad_orientation(self, orientation=None):
         if 'touchpad' in self.names_devices:
             coordinate_transformation_matrix = {
@@ -430,18 +454,21 @@ class Interface(QWidget):
         if mode == 'tablet':
             self.display_orientation(orientation     = 'left')
             self.touchscreen_orientation(orientation = 'left')
+            self.stylus_orientation(orientation      = 'left')
             self.touchpad_switch(status              = 'off')
             self.nipple_switch(status                = 'off') 
         elif mode == 'laptop':
             self.display_orientation(orientation     = 'normal')
             self.touchscreen_orientation(orientation = 'normal')
             self.touchscreen_switch(status           = 'on')
+            self.stylus_orientation(orientation      = 'normal')
             self.touchpad_orientation(orientation    = 'normal')
             self.touchpad_switch(status              = 'on')
             self.nipple_switch(status                = 'on')
         elif mode in ['left', 'right', 'inverted', 'normal']:
             self.display_orientation(orientation     = mode)
             self.touchscreen_orientation(orientation = mode)
+            self.stylus_orientation(orientation      = mode)
             self.touchpad_orientation(orientation    = mode)
         else:
             log.error('unknown mode "{mode}" requested'.format(mode=mode))
