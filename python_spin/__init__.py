@@ -44,7 +44,7 @@ options:
 """
 
 name        = 'spin'
-__version__ = '2020-02-05T1555Z'
+__version__ = '2020-02-06T0230Z'
 
 import docopt
 import glob
@@ -55,10 +55,6 @@ import socket
 import subprocess
 import sys
 import time
-
-if sys.version_info[0] <= 2:
-    print('Python >2 required')
-    sys.exit(1)
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -329,11 +325,11 @@ class Interface(QWidget):
     def stylus_proximity_control(self):
         self.previous_stylus_proximity_status=None
         while True:
-            stylus_proximity_command = 'xinput query-state '                +\
-                                       '"Wacom ISDv4 EC Pen stylus" | '     +\
-                                       'grep Proximity | cut -d " " -f3 | ' +\
+            stylus_proximity_command = 'xinput query-state '                                                 +\
+                                       '"{name_device}" | '.format(name_device=self.names_devices['stylus']) +\
+                                       'grep Proximity | cut -d " " -f3 | '                                  +\
                                        ' cut -d "=" -f2'
-            self.stylus_proximity_status = subprocess.check_output(stylus_proximity_command, shell = True).lower().rstrip()
+            self.stylus_proximity_status = subprocess.check_output(stylus_proximity_command, shell=True).lower().rstrip()
             if\
                 (self.stylus_proximity_status == 'out') and \
                 (self.previous_stylus_proximity_status != 'out'):
@@ -410,11 +406,11 @@ class Interface(QWidget):
                 if self.display_position_status == 'laptop':
                     self.engage_mode(mode='tablet')
                     self.display_position_status = 'tablet'
-                    log.info('display position is {display_position_status}'.format(display_position_status = self.display_position_status))
+                    log.info('display position is {display_position_status}'.format(display_position_status=self.display_position_status))
                 elif self.display_position_status == 'tablet':
                     self.engage_mode(mode='laptop')
                     self.display_position_status = 'laptop'
-                    log.info('display position is {display_position_status}'.format(display_position_status = self.display_position_status))
+                    log.info('display position is {display_position_status}'.format(display_position_status=self.display_position_status))
             time.sleep(0.15)
 
     def display_position_control_switch(self, status=None):
@@ -462,15 +458,18 @@ def get_inputs():
     devices_and_keyphrases = {
         'touchscreen': ['SYNAPTICS Synaptics Touch Digitizer V04',
                         'ELAN Touchscreen',
-                        'Wacom Co.,Ltd. Pen and multitouch sensor Finger touch'],
+                        'Wacom Co.,Ltd. Pen and multitouch sensor Finger touch',
+                        'Wacom Pen and multitouch sensor Finger touch'],
         'touchpad'   : ['PS/2 Synaptics TouchPad',
                         'SynPS/2 Synaptics TouchPad',
-                        'ETPS/2 Elantech Touchpad'],
+                        'ETPS/2 Elantech Touchpad',
+                        'SynPS/2 Synaptics TouchPad'],
         'nipple'     : ['TPPS/2 IBM TrackPoint',
-                        'ETPS/2 Elantech TrackPoint'],
+                        'ETPS/2 Elantech TrackPoint',
+                        'TPPS/2 Elan TrackPoint'],
         'stylus'     : ['Wacom ISDv4 EC Pen stylus',
                         'Wacom Co.,Ltd. Pen and multitouch sensor Pen stylus',
-                        'Wacom Co.,Ltd. Pen and multitouch sensor Pen eraser']
+                        'Wacom Pen and multitouch sensor Pen stylus']
     }
     names_devices = {}
     for device, keyphrases in list(devices_and_keyphrases.items()):

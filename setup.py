@@ -7,7 +7,7 @@ import setuptools
 def main():
     setuptools.setup(
         name                 = 'python_spin',
-        version              = '2020.02.05.1555',
+        version              = '2020.02.06.0230',
         description          = 'a small utility to assist in setting usage modes of laptop-tablet devices',
         long_description     = long_description(),
         url                  = 'https://github.com/wdbm/spin',
@@ -23,7 +23,8 @@ def main():
                                'console_scripts': ('spin = python_spin.__init__:main')
                                },
         include_package_data = True,
-        zip_safe             = False
+        zip_safe             = False,
+        python_requires      = '>=3.6'
     )
 
 def long_description(filename = 'README.md'):
